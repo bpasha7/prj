@@ -1,4 +1,4 @@
-<form class="form-style" onSubmit="return false">
+<form id="create_form" class="form-style" onSubmit="return false">
 <label id="form_titel" class="form-titel">Form Name</label>
 <div class="styled-select">
 <select name="group" id="groups">

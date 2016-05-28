@@ -23,9 +23,9 @@ class Form extends Controller
    	{
 		$this->model->createitem();
 	}
-	public function upload($path)
+	public function upload()
 	{
-		$this->model->upload($path);
+		$this->model->upload();
 	}
 	public function lotfields()
 	{
