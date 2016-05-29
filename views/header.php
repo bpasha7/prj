@@ -2,7 +2,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>
-		Test
+		Интернет-аукцион
 	</title>
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,300&subset=latin,cyrillic' rel='stylesheet'>
