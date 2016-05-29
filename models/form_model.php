@@ -99,17 +99,17 @@ class Form_Model extends Model
                 <div align="center">
                 <h3>Выберите файлы</h3>
                 <form id="create_form" class="form-style" onSubmit="return false"/>
-                <form action="" onSubmit="return false" method="post" enctype="multipart/form-data" id="MyUploadForm">
+                <form action="'.URL.'form/upload" onSubmit="return false" method="post" enctype="multipart/form-data" id="MyUploadForm">
                 <input type="file" name="files[]" multiple="multiple" id="files">
                 <input type="submit"  id="submit-btn" value="Upload" />
-                <img src="images/ajax-loader.gif" id="loading-img" style="display:none;" alt="Please Wait"/>
+                <img src="'.URL.'public/images/ajax-loader.gif" id="loading-img" style="display:none;" alt="Please Wait"/>
                 </form>
                 <div id="progressbox" style="display:none;"><div id="progressbar"></div><div id="statustxt">0%</div></div>
                 <div id="output"></div>
                 </div>
                 </div>';
                 echo '<li>
-                <input id="smt" value="Создать" />
+                <input type="submit" id="smt" value="Создать" />
                 </li>';
             }
         }
@@ -137,7 +137,7 @@ class Form_Model extends Model
             $sth->closeCursor();
             for ($i = 0;$i < count($paramsname);$i++) {
                 //$data[$paramsname[$i]] = $_POST[$paramsname[$i]];
-                echo $data;
+                //echo $data;
                 $data[] = $paramsname[$i];
                 $data[] = $_POST[$paramsname[$i]];
 
@@ -151,9 +151,34 @@ class Form_Model extends Model
                         ':titel' => $_POST['Titel'],
                         ':data' => $d
                     )))
-            echo 'OK';
-            else
-            echo 'NOO';//print $this->errorInfo();
+                    {
+						$row = $sth->fetch(PDO::FETCH_LAZY);
+						$lID = $row['LastID'];
+						$dir = Session::get('imgDir');
+						$destination_folder= realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$lID.'\\';
+						mkdir($destination_folder);
+						// Get array of all source files
+$files = scandir($dir);
+// Identify directories
+// Cycle through all source files
+foreach ($files as $file) {
+  if (in_array($file, array(".",".."))) continue;
+  // If we copied this successfully, mark it for deletion
+  if (copy($dir.$file, $destination_folder.$file)) {
+    $delete[] = $dir.$file;
+  }
+  
+}
+// Delete all successfully-copied files
+foreach ($delete as $file) {
+  unlink($file);
+}
+rmdir($dir);
+						echo 'Товар успешно добавлен!';
+						
+					}
+					else
+            echo 'Ошибка Добавлении!';
             $sth->closeCursor();
         }
     }
@@ -202,18 +227,23 @@ class Form_Model extends Model
     {
 
     }
+    //======================Uploading=============================
     public function upload()
     {
         ############ Configuration ##############
         $thumb_square_size = 200; //Thumbnails will be cropped to 200x200 pixels
         $max_image_size    = 500; //Maximum image size (height and width)
         $thumb_prefix      = "thumb_"; //Normal thumb Prefix
-        $destination_folder= URL."public/data/"; //upload directory ends with / (slash)
+        $uniqnum = rand(1,time()/5000);
+        $destination_folder= realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\cache\\'.$uniqnum.'\\'; //upload directory ends with / (slash)
+        Session::init();
+        Session::set('imgDir', $destination_folder);
+        //create uniq folder
+        mkdir($destination_folder);
         $jpeg_quality      = 90; //jpeg quality
         $count             = 1;
         ##########################################
-
-        //continue only if $_POST is set and it is a Ajax request
+        #####  This function will proportionally resize image #####
         if (isset($_POST) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 
             // check $_FILES['ImageFile'] not empty
@@ -258,7 +288,7 @@ class Form_Model extends Model
                     $image_name_only   = strtolower($image_info["filename"]);//file name only, no extension
 
                     //create a random name for new image (Eg: fileName_293749.jpg) ;
-                    $new_file_name     = $count.'.' . $image_extension;// $image_name_only. '_' .  rand(0, 9999999999) .
+                    $new_file_name     = $count . '.' . $image_extension;// $image_name_only. '_' .  rand(0, 9999999999) .
                     $count++;
                     //folder path to save resized images and thumbnails
                     $thumb_save_folder = $destination_folder . $thumb_prefix . $new_file_name;
@@ -270,11 +300,14 @@ class Form_Model extends Model
                         if (!crop_image_square($image_res, $thumb_save_folder, $image_type, $thumb_square_size, $image_width, $image_height, $jpeg_quality)) {
                             die('Error Creating thumbnail');
                         }
-
+                        /*echo $image_save_folder;
+                        echo __DIR__;
+                        echo realpath($_SERVER['DOCUMENT_ROOT']);
+                        echo getcwd();*/
                         /* We have succesfully resized and created thumbnail image
                         We can now output image to user's browser or store information in the database*/
                         //echo ' < div align = "center" > ';
-                        echo '<img src="uploads/'.$thumb_prefix . $new_file_name.'" alt="Thumbnail">';
+                        echo '<img src="http://wts.dev/public/data/cache/'.$uniqnum.'\\'.$thumb_prefix . $new_file_name.'" alt="Thumbnail">';
                         //echo ' < br />';
                         /*echo '<img src="uploads/'. $new_file_name.'" alt="Resized Image">';*/
                         //echo '</div > ';
@@ -285,80 +318,79 @@ class Form_Model extends Model
 
             }
         }
-
-        #####  This function will proportionally resize image #####
-        function normal_resize_image($source, $destination, $image_type, $max_size, $image_width, $image_height, $quality)
-        {
-
-            if ($image_width <= 0 || $image_height <= 0) {
-                return false;
-            } //return false if nothing to resize
-
-            //do not resize if image is smaller than max size
-            if ($image_width <= $max_size && $image_height <= $max_size) {
-                if (save_image($source, $destination, $image_type, $quality)) {
-                    return true;
-                }
-            }
-
-            //Construct a proportional size of new image
-            $image_scale = min($max_size / $image_width, $max_size / $image_height);
-            $new_width   = ceil($image_scale * $image_width);
-            $new_height  = ceil($image_scale * $image_height);
-
-            $new_canvas  = imagecreatetruecolor( $new_width, $new_height ); //Create a new true color image
-
-            //Copy and resize part of an image with resampling
-            if (imagecopyresampled($new_canvas, $source, 0, 0, 0, 0, $new_width, $new_height, $image_width, $image_height)) {
-                save_image($new_canvas, $destination, $image_type, $quality); //save resized image
-            }
-
-            return true;
-        }
-
-        ##### This function corps image to create exact square, no matter what its original size! ######
-        function crop_image_square($source, $destination, $image_type, $square_size, $image_width, $image_height, $quality)
-        {
-            if ($image_width <= 0 || $image_height <= 0) {
-                return false;
-            } //return false if nothing to resize
-
-            if ( $image_width > $image_height ) {
-                $y_offset = 0;
-                $x_offset = ($image_width - $image_height) / 2;
-                $s_size   = $image_width - ($x_offset * 2);
-            }else {
-                $x_offset = 0;
-                $y_offset = ($image_height - $image_width) / 2;
-                $s_size   = $image_height - ($y_offset * 2);
-            }
-            $new_canvas = imagecreatetruecolor( $square_size, $square_size); //Create a new true color image
-
-            //Copy and resize part of an image with resampling
-            if (imagecopyresampled($new_canvas, $source, 0, 0, $x_offset, $y_offset, $square_size, $square_size, $s_size, $s_size)) {
-                save_image($new_canvas, $destination, $image_type, $quality);
-            }
-
-            return true;
-        }
-
-        ##### Saves image resource to file #####
-        function save_image($source, $destination, $image_type, $quality)
-        {
-            switch (strtolower($image_type)) {
-                //determine mime type
-                case 'image/png':
-                imagepng($source, $destination); return true; //save png file
-                break;
-                case 'image/gif':
-                imagegif($source, $destination); return true; //save gif file
-                break;
-                case 'image/jpeg': case 'image/pjpeg':
-                imagejpeg($source, $destination, $quality); return true; //save jpeg file
-                break;
-                default: return false;
-            }
-        }
     }
 }
+    #####  This function will proportionally resize image #####
+    function normal_resize_image($source, $destination, $image_type, $max_size, $image_width, $image_height, $quality)
+    {
+
+        if ($image_width <= 0 || $image_height <= 0) {
+            return false;
+        } //return false if nothing to resize
+
+        //do not resize if image is smaller than max size
+        if ($image_width <= $max_size && $image_height <= $max_size) {
+            if (save_image($source, $destination, $image_type, $quality)) {
+                return true;
+            }
+        }
+
+        //Construct a proportional size of new image
+        $image_scale = min($max_size / $image_width, $max_size / $image_height);
+        $new_width   = ceil($image_scale * $image_width);
+        $new_height  = ceil($image_scale * $image_height);
+
+        $new_canvas  = imagecreatetruecolor( $new_width, $new_height ); //Create a new true color image
+
+        //Copy and resize part of an image with resampling
+        if (imagecopyresampled($new_canvas, $source, 0, 0, 0, 0, $new_width, $new_height, $image_width, $image_height)) {
+            save_image($new_canvas, $destination, $image_type, $quality); //save resized image
+        }
+
+        return true;
+    }
+
+    ##### This function corps image to create exact square, no matter what its original size! ######
+    function crop_image_square($source, $destination, $image_type, $square_size, $image_width, $image_height, $quality)
+    {
+        if ($image_width <= 0 || $image_height <= 0) {
+            return false;
+        } //return false if nothing to resize
+
+        if ( $image_width > $image_height ) {
+            $y_offset = 0;
+            $x_offset = ($image_width - $image_height) / 2;
+            $s_size   = $image_width - ($x_offset * 2);
+        }else {
+            $x_offset = 0;
+            $y_offset = ($image_height - $image_width) / 2;
+            $s_size   = $image_height - ($y_offset * 2);
+        }
+        $new_canvas = imagecreatetruecolor( $square_size, $square_size); //Create a new true color image
+
+        //Copy and resize part of an image with resampling
+        if (imagecopyresampled($new_canvas, $source, 0, 0, $x_offset, $y_offset, $square_size, $square_size, $s_size, $s_size)) {
+            save_image($new_canvas, $destination, $image_type, $quality);
+        }
+
+        return true;
+    }
+
+    ##### Saves image resource to file #####
+    function save_image($source, $destination, $image_type, $quality)
+    {
+        switch (strtolower($image_type)) {
+            //determine mime type
+            case 'image/png':
+            imagepng($source, $destination); return true; //save png file
+            break;
+            case 'image/gif':
+            imagegif($source, $destination); return true; //save gif file
+            break;
+            case 'image/jpeg': case 'image/pjpeg':
+            imagejpeg($source, $destination, $quality); return true; //save jpeg file
+            break;
+            default: return false;
+        }
+    }
 ?>

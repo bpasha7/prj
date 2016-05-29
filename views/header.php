@@ -15,8 +15,9 @@
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/home.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/form.css">
 <!--	 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> -->
-	<script src="<?php echo URL; ?>public/scripts/jquery.form.min.js"></script>
-	<script src="<?php echo URL; ?>public/scripts/jquery-1.10.2.min.js"></script>
+	
+	<script type="text/javascript" src="<?php echo URL; ?>public/scripts/jquery-2.2.4.js"></script>
+	<script type="text/javascript" src="<?php echo URL; ?>public/scripts/jquery.form.js"></script>
 	<script src="<?php echo URL; ?>public/scripts/general.js"></script>
 	<script src="<?php echo URL; ?>public/scripts/dashboard.js"></script>
 <!--	<script src="<?php echo URL; ?>views/dashboard/scripts/default.js"></script>-->
@@ -27,7 +28,6 @@
    }
   }*/
 ?>-->
-
 </head>
 <body>
 <?php Session::init(); ?>

@@ -222,14 +222,14 @@ $.ajax({
                     }  
                 }); 
 });
-	$('#content').on('click','#smt', function(){
+	$('#content').on('submit','#create_form', function(){
 var data = $(this).serialize();
 		  		$.ajax({   
                    url: URL+'form/createitem', 
                    type: "POST",
                    data: data,
-                   success: function(){ 
-                   		alert('Товар добавлен!');  
+                   success: function(html){ 
+                   		alert(html);  
                     }  
                 }); 
 });
@@ -248,7 +248,7 @@ var progressbox     = $('#progressbox');
 		}; 
 		
 	// $('#MyUploadForm').submit(function() { 
-	$('#content').on('submit','#submit-btn', function(){
+	$('#content').on('click','#submit-btn', function(){
 			$('#MyUploadForm').ajaxSubmit(options);  			
 			// return false to prevent standard browser submit and page navigation 
 			return false; 
@@ -258,8 +258,8 @@ var progressbox     = $('#progressbox');
 function OnProgress(event, position, total, percentComplete)
 {
 	//Progress bar
-	progressbar.width(percentComplete + '%') //update progressbar percent complete
-	statustxt.html(percentComplete + '%'); //update status text
+	$('#progressbar').width(percentComplete + '%') //update progressbar percent complete
+	$('#statustxt').html(percentComplete + '%'); //update status text
 	if(percentComplete>50)
 		{
 			statustxt.css('color','#fff'); //change status text to white after 50%
@@ -280,12 +280,12 @@ function beforeSubmit(){
    if (window.File && window.FileReader && window.FileList && window.Blob)
 	{
 
-		/*if( !$('#imageInput').val()) //check empty input filed
+		if( !$('#files').val()) //check empty input filed
 		{
 			$("#output").html("Are you kidding me?");
 			return false
 		}
-		var fsize = $('#imageInput')[0].files[0].size; //get file size
+		/*var fsize = $('#imageInput')[0].files[0].size; //get file size
 		var ftype = $('#imageInput')[0].files[0].type; // get file type
 		
 		//allow only valid image file types 
@@ -307,10 +307,10 @@ function beforeSubmit(){
 		
 		
 		//Progress bar
-		progressbox.show(); //show progressbar
-		progressbar.width(completed); //initial value 0% of progressbar
-		statustxt.html(completed); //set status text
-		statustxt.css('color','#000'); //initial color of status text
+		$('#progressbox').show(); //show progressbar
+		$('#progressbar').width(completed); //initial value 0% of progressbar
+		$('#statustxt').html(completed); //set status text
+		$('#statustxt').css('color','#000'); //initial color of status text
 
 				
 		$('#submit-btn').hide(); //hide submit button
