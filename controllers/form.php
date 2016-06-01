@@ -34,6 +34,14 @@ class Form extends Controller
 	{
 		$this->model->lotfields();
 	}
+	public function registration()
+	{
+		$this->model->registration();
+	}
+	public function registrationfields()
+	{
+		$this->model->registrationfields();
+	}
 	public function test()
 	{
 		$this->model->test();

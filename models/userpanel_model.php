@@ -90,11 +90,11 @@ class UserPanel_Model extends Model
                     ':userid'=> $userid
                 ));
             $count = $sth->rowCount();
-            if ($count > 0) {
-                echo "<tr>\n
+            echo "<tr>\n
                 \t<td>Товар <a id=\"new_item\" rel=\"form\">(Добавить новый)</a></td>\n
                 \t<td>Группа</td>\n
                 \t<td width=\"110\" class=\"ac\">Управление</td></tr>\n";
+            if ($count > 0) {
                 $odd = 1;
                 while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
                     if ($odd % 2 == 0)

@@ -10,10 +10,10 @@ class Login_Model extends Model
 		//echo "ter";
 		//$data = array('status' => 'OK','username'=> '456', 'userrole'=> '7777');
  			//echo json_encode($data);
-		$sth=$this->database->prepare("SELECT UserID, UserRole, UserName FROM Users WHERE UserMail = :login AND UserPass = MD5(:password)");
+		$sth=$this->database->prepare("SELECT UserID, UserRole, UserName FROM Users WHERE UserMail = :login AND UserPass = :password");
 		$sth->execute(array(
 				':login'   => $_POST['login'],
-				':password'=> $_POST['password']
+				':password'=> base64_encode(md5($_POST['password']))
 			));
 			//$data= $sth->fetchAll();
        // echo json_encode($data);

@@ -1,5 +1,5 @@
 <?php
-class Help extends Controller
+class Menu extends Controller
 {
 	public function __construct()
 	{
@@ -7,9 +7,17 @@ class Help extends Controller
 		//echo "Мы HELP";
 		//$this->view->render('help / index');
 	}
+	public function help()
+	{
+		$this->view->render('menu/help', TRUE);
+	}
 	public function index()
 	{
-		$this->view->render('help/index');
+		$this->view->render('menu/index', TRUE);
+	}
+	public function rules()
+	{
+		$this->view->render('menu/rules', TRUE);
 	}
 	public function other($arg = false)
 	{

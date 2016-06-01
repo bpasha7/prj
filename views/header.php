@@ -54,10 +54,10 @@
 <div id="login_back" class="back"></div>
 <div id="container">
 	<ul id="nav">
-		<li id="selected"><a href="<?php echo URL; ?>index">Главная</a></li>
-		<li><a href="#">Аукцион</a></li>
-		<li><a href="<?php echo URL; ?>index">Правила</a></li>
-		<li><a id="menu_help">Помощь</a></li>
+		<li><a rel="menu/index">Главная</a></li>
+		<li><a rel="menu/auction">Аукцион</a></li>
+		<li><a rel="menu/rules" ">Правила</a></li>
+		<li><a rel="menu/help">Помощь</a></li>
 		<li><a href="#">О нас</a></li>
 		<?php
 			if(Session::get('loggedIn') != true)

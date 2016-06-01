@@ -1,137 +1,173 @@
 $(document).ready(function($){
-var URL = 'http://wts.dev/';
-var h = 0;
-//Logining
-$("#login_back").on('submit', '#loginForm', function(e){
-        var data = $(this).serialize();
-        $.ajax({
-                url: "http://wts.dev/login/run",
-                dataType: "json",
-                type: "POST",
-                data: data,
-                success: function(data){
-                    $('#bar_username').val(data.UserName);
-                    $('#userbar_user').text(data.UserName);
-                    $('#body_login').css('display','none');
-                    $('#open_userbar').css('visibility','visible');
-                    $('#open_userbar').text(data.UserName + " ");
-                    $("#menu_login").hide();
-                    //$("#loginForm").fadeOut("slow");
-                    $('#login_back').fadeOut(2500);
-                },
-                error: function() {
-                    alert("Неправильные логин или пароль");
-                }
-            });
-        return false;
-    });
-//Load Login form
-$('body').delegate('#menu_login', 'click', function(){
-        $( ".back" ).empty();
-        $( ".back" ).show();
-        $.ajax({
-                url: URL+'login/index',
-                success: function(html){
-                    $('.back').html(html);
-                }
-            });
-        return false;
-    });
-//Hide login back
-$("#login_back").click(function(e){
-	if(e.target == this)
-  $(this).fadeOut("fast");
-});
-//logout from control panel
-$("#logout").click(function(e){
-        var returnVal = confirm("Выйти из учетной записи?");
-        if(returnVal){
-            $('#open_userbar').click();
-            //$('#top-box').attr("checked", false);
-            $('#open_userbar').text("");
-            $('#open_userbar').css('visibility','hidden');
-            $("#menu_login").show();
-            $.post("http://wts.dev/dashboard/logout",function(data){
-                });
-
-        }
-    });
-//Check balance after open userPanel
-$('#open_userbar').click(function(e){
-        if($("#top-box").is(':checked'))
-        {
-            //$('#tst').height(250);
-            var h = $('#tst').height();
-            $('#open_userbar').offset({top:0, right:5});
-            $('#tst').offset({top: -h});
-        }
-        else
-        {
-            var h = $('#tst').height();
-            $('#open_userbar').offset({top:h, right:5});
-            $('#tst').offset({top: 0});
-            $.ajax({
-                    url: "http://wts.dev/userpanel/about",
-                    dataType: "json",
-                    type: "POST",
-                    success: function(data){
-                        $('#userbar_rub').text(data.rub+ " ");
-                        $('#userbar_dol').text(data.dol+ " ");
-                        $('#userbar_bonuses').text(data.bon+ " ");
-                        $('#my_items').text("Мои Товары (" +data.itemcount+")");
-                        $('#my_lots').text("Мои Лоты (" +data.lotcount+")");
-                    },
-                    error:function(){
-                        alert("ERROR");
+        var URL = 'http://wts.dev/';
+        var h = 0;
+        
+//==MENU===============================================
+$('#nav li a').click(function(){
+	var menuId = $(this).attr('rel');
+	if(menuId !== undefined)
+		{
+			
+		
+	$.ajax({
+                        url: URL+menuId,
+                        success: function(html){
+                            $('#content').html(html);
+                        }
+                    });
                     }
-                });
-        }
-    });
-//Users lots
-$('#my_lots').click(function(e){
-        $('#tst').animate({
-                height: "500"
-            }, 500, function() {
+});
+//====================================================
+        //Logining
+        $("#login_back").on('submit', '#loginForm', function(e){
+                var data = $(this).serialize();
                 $.ajax({
-                        url: URL+'userpanel/index',
-                        success: function(html){
-                            $("#userbar_content").html(html);
+                        url: "http://wts.dev/login/run",
+                        dataType: "json",
+                        type: "POST",
+                        data: data,
+                        success: function(data){
+                            $('#bar_username').val(data.UserName);
+                            $('#userbar_user').text(data.UserName);
+                            $('#body_login').css('display','none');
+                            $('#open_userbar').css('visibility','visible');
+                            $('#open_userbar').text(data.UserName + " ");
+                            $("#menu_login").hide();
+                            //$("#loginForm").fadeOut("slow");
+                            $('#login_back').fadeOut("fast");
+                        },
+                        error: function() {
+                            alert("Неправильные логин или пароль");
                         }
                     });
-                $('#open_userbar').offset({top:500, right:5});
-                $( "#tbl" ).empty();
+                return false;
+            });
+        //Load Login form
+        $('body').delegate('#menu_login', 'click', function(){
+                $( ".back" ).empty();
+                $( ".back" ).show();
                 $.ajax({
-                        url: URL+'userpanel/lots',
+                        url: URL+'login/index',
                         success: function(html){
-                            $("#tbl").html(html);
-                            $('#tbl_name').text('Мои Лоты');
+                            $('.back').html(html);
                         }
-                        //return false;
+                    });
+                return false;
+            });
+        //Hide login back
+        $("#login_back").click(function(e){
+                if(e.target == this)
+                $(this).fadeOut("fast");
+            });
+        //Registration
+        $("#login_back").on('click', '#create_account', function(e){
+                $('#login_back').fadeOut("fast");
+                //var data = $(this).serialize();
+                $.ajax({
+                        url: URL+'form',
+                        success: function(html){
+                            $('#content').html(html);
+                            $('#form_titel').text('Форма Регистрации');
+                        }
+                    });
+                $.ajax({
+                        url: URL+'form/registrationfields',
+                        success: function(html){
+                            $('#form_fields').html(html);
+                        }
+                    });           
+                //return false;
+            });
+        //logout from control panel
+        $("#logout").click(function(e){
+                var returnVal = confirm("Выйти из учетной записи?");
+                if(returnVal){
+                    $('#open_userbar').click();
+                    //$('#top-box').attr("checked", false);
+                    $('#open_userbar').text("");
+                    $('#open_userbar').css('visibility','hidden');
+                    $("#menu_login").show();
+                    $.post("http://wts.dev/dashboard/logout",function(data){
+                        });
+
+                }
+            });
+        //Check balance after open userPanel
+        $('#open_userbar').click(function(e){
+                if($("#top-box").is(':checked'))
+                {
+                    //$('#tst').height(250);
+                    var h = $('#tst').height();
+                    $('#open_userbar').offset({top:0, right:5});
+                    $('#tst').offset({top: -h});
+                }
+                else
+                {
+                    var h = $('#tst').height();
+                    $('#open_userbar').offset({top:h, right:5});
+                    $('#tst').offset({top: 0});
+                    $.ajax({
+                            url: "http://wts.dev/userpanel/about",
+                            dataType: "json",
+                            type: "POST",
+                            success: function(data){
+                                $('#userbar_rub').text(data.rub+ " ");
+                                $('#userbar_dol').text(data.dol+ " ");
+                                $('#userbar_bonuses').text(data.bon+ " ");
+                                $('#my_items').text("Мои Товары (" +data.itemcount+")");
+                                $('#my_lots').text("Мои Лоты (" +data.lotcount+")");
+                            },
+                            error:function(){
+                                alert("ERROR");
+                            }
+                        });
+                }
+            });
+        //Users lots
+        $('#my_lots').click(function(e){
+                $('#tst').animate({
+                        height: "500"
+                    }, 500, function() {
+                        $.ajax({
+                                url: URL+'userpanel/index',
+                                success: function(html){
+                                    $("#userbar_content").html(html);
+                                }
+                            });
+                        $('#open_userbar').offset({top:500, right:5});
+                        $( "#tbl" ).empty();
+                        $.ajax({
+                                url: URL+'userpanel/lots',
+                                success: function(html){
+                                    $("#tbl").html(html);
+                                    $('#tbl_name').text('Мои Лоты');
+                                }
+                                //return false;
+                            });
                     });
             });
-    });
-//Users items
-$('#my_items').click(function(e){
-        $('#tst').animate({
-                height: "500"
-            }, 500, function() {
-                $.ajax({
-                        url: URL+'userpanel/index',
-                        success: function(html){
-                            $("#userbar_content").html(html);
-                        }
+        //Users items
+        $('#my_items').click(function(e){
+                $('#tst').animate({
+                        height: "500"
+                    }, 500, function() {
+                        $.ajax({
+                                url: URL+'userpanel/index',
+                                success: function(html){
+                                    $("#userbar_content").html(html);
+                                }
+                            });
+                        $('#open_userbar').offset({top:500, right:5});
+                        $( "#tbl" ).empty();
+                        $.ajax({
+                                url: URL+'userpanel/items',
+                                success: function(html){
+                                    $("#tbl").html(html);
+                                    $('#tbl_name').text('Мои товары');
+                                    // return false;
+                                }
+                            });
                     });
-                $('#open_userbar').offset({top:500, right:5});
-                $( "#tbl" ).empty();
-                $.ajax({
-                        url: URL+'userpanel/items',
-                        success: function(html){
-                            $("#tbl").html(html);
-                            $('#tbl_name').text('Мои товары');
-                           // return false;
-                        }
-                    });
-                 });
             });
         //delete items by click
         $("#userbar_content").on('click','a.ico.del', function(){
@@ -149,14 +185,14 @@ $('#my_items').click(function(e){
             });
         //Create lot
         $("#userbar_content").on('click','a.ico.create', function(){
-        	var lotName = $(this).attr('name');
-        	var lotId = $(this).attr('rel');
+                var lotName = $(this).attr('name');
+                var lotId = $(this).attr('rel');
                 if(confirm("Перейти к созданию лота <"+lotName+">?")){
                     $.ajax({
                             url: URL+'form',
                             success: function(html){
                                 $('#content').html(html);
-                                $('#form_titel').text('Создание лота<' + lotName +'>');                              
+                                $('#form_titel').text('Создание лота<' + lotName +'>');
                                 $('#open_userbar').click();
                             }
                         });
@@ -201,7 +237,7 @@ $('#my_items').click(function(e){
                         }
                     });
             });
-            //Selecting group
+        //Selecting group
         $('#content').on('change','#groups', function(){
                 var id = $('#groups').val();
                 $.ajax({
@@ -213,51 +249,75 @@ $('#my_items').click(function(e){
                         }
                     });
             });
-            //Submitting forms
+        //Submitting forms
         $('#content').on('submit','#create_form', function(){
-        	//if lot or item
+                //if lot or item
                 var data = $(this).serialize();
                 var formName = $('#submit_form').attr('name');
                 switch(formName){
-					case 'lot':
-					$.ajax({
-                        url: URL+'form/createlot',
-                        type: "POST",
-                        data: data,
-                        success: function(res){
-                            if(res == 'OK'){
-                                alert('Лот Успешно создан');
-                                $('#content').empty();
-                                $('html, body').animate({scrollTop:0}, 'slow');
+                    case 'reg':
+                    if($('#pass1').val()!=$('#pass2').val())
+                    	{
+							alert('Пароли не совпадают, повторите ввод!');
+							$('#pass1').val('');
+							$('#pass2').val('');
+							return false;
+						}
+                    $.ajax({
+                            url: URL+'form/registration',
+                            type: "POST",
+                            data: data,
+                            success: function(res){
+                                if(res == 'OK'){
+                                    alert('Вы зарегистрированы!');
+                                    $('#content').empty();
+                                    $('html, body').animate({scrollTop:0}, 'slow');
+                                }
+                                else{
+                                    alert(res);
+                                }
                             }
-                            else{
-                                alert(res);
+                        });
+                    break;
+                    case 'lot':
+                    $.ajax({
+                            url: URL+'form/createlot',
+                            type: "POST",
+                            data: data,
+                            success: function(res){
+                                if(res == 'OK'){
+                                    alert('Лот Успешно создан');
+                                    $('#content').empty();
+                                    $('html, body').animate({scrollTop:0}, 'slow');
+                                }
+                                else{
+                                    alert(res);
+                                }
                             }
-                        }
-                    });
-						break;
-					case 'item':
-					$.ajax({
-                        url: URL+'form/createitem',
-                        type: "POST",
-                        data: data,
-                        success: function(res){
-                            if(res == 'OK'){
-                                alert('Товар успешно добавлен');
-                                $('#content').empty();
-                                $('html, body').animate({scrollTop:0}, 'slow');
+                        });
+                    break;
+                    case 'item':
+                    $.ajax({
+                            url: URL+'form/createitem',
+                            type: "POST",
+                            data: data,
+                            success: function(res){
+                                if(res == 'OK'){
+                                    alert('Товар успешно добавлен');
+                                    $('#content').empty();
+                                    $('html, body').animate({scrollTop:0}, 'slow');
+                                }
+                                else{
+                                    alert(res);
+                                }
                             }
-                            else{
-                                alert(res);
-                            }
-                        }
-                    });
-						break;
-					
-					default:
-						break;
-				}
-                
+                        });
+                    break;
+
+                    default:
+                    break;
+                }
+
             });
         //===========UPLOADING=======================
         var progressbox     = $('#progressbox');

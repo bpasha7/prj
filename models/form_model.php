@@ -3,15 +3,23 @@ class Form_Model extends Model
 {
     public function __construct()
     {
-    	Session::init(); 
-    	$role = Session::get('Role');
-        parent::__construct($role,'');       
+        Session::init();
+        if (!empty($_SESSION['Role'])) {
+            $role = Session::get('Role');
+            parent::__construct($role,'');
+        }
+        else
+        parent::__construct();
     }
     public function test()
     {
-
-echo str_replace(',','.',"123,3123");
-        
+        $role = Session::get('Role');
+        echo $role;
+        $pas = '12345';
+        $md  = md5($pas);
+        $bs  = base64_encode($pas);
+        $bm  = base64_encode($md);
+        echo $pas. '+ '. $md. ' + '. $bs. ' + '. $bm;
     }
     public function groups()
     {
@@ -34,9 +42,40 @@ echo str_replace(',','.',"123,3123");
         }
         $sth->closeCursor();
     }
+    public function registration()
+    {
+    	$sth = $this->database->prepare("SELECT registration( :Uname, :Umail, :Utel, :Upass )");
+    	$this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+            if (        $sth->execute(array(
+                        ':Uname' => $_POST['username'],
+                        ':Umail' => $_POST['email'],
+                        ':Utel' => str_replace('-','',$_POST['tel']),
+                        ':Upass' => base64_encode(md5($_POST['pass']))
+                    ))) 
+                    echo 'OK';
+                   else
+                    print_r($sth->errorInfo());//echo 'Ошибка создания учетной записи!';
+    }
+    public function registrationfields()
+    {
+        //echo ' < input id = "item_id" name = "item_id" type = "text" hidden/>';
+        echo '<li><label class="form-label">Фамилия Имя</label>
+        <input name="username" type="text" class="field-style field-full align-none" placeholder="Введите Фамилию и Имя" required/>
+        </li>';
+        echo '<li><label class="form-label">E-mail</label>
+        <input name="email" type="text" class="field-style field-full align-none" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" placeholder="Введите E-mail" required/>';
+        echo '<li><label class="form-label">Номер телефона</label>
+        <input name="tel" type="text" class="field-style field-full align-none" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Введите номер телефона Формат: XXX-XXX-XXXX" required/>';
+        echo '<li><label class="form-label">Пароль</label>
+        <input id="pass1" name="pass" type="password" class="field-style field-full align-none" placeholder="Введите Пароль" required/>';
+        echo '<li><label class="form-label">Повторите ввод</label>
+        <input id="pass2" type="password" class="field-style field-full align-none" placeholder="Повторите ввод" required/>';
+        echo '<li><input id="submit_form" name="reg" type="submit" value="Создать" />
+        </li>';
+    }
     public function fields($arg)
     {
-       // Session::init();
+        // Session::init();
         if (Session::get('loggedIn') == true && $arg != false) {
             $userid = Session::get('User');
             $params = array();
@@ -107,7 +146,7 @@ echo str_replace(',','.',"123,3123");
     }
     public function createitem()
     {
-       // Session::init();
+        // Session::init();
 
         if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
             $paramsname = array();
@@ -142,48 +181,46 @@ echo str_replace(',','.',"123,3123");
                         ':titel' => $_POST['Titel'],
                         ':data' => $d
                     ))) {
-                    	if (!empty($_SESSION['imgDir'])){
-                $row                = $sth->fetch(PDO::FETCH_LAZY);
-                $lID                = $row['LastID'];
-                $dir                = Session::get('imgDir');
-                $destination_folder = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$lID.'\\';
-                mkdir($destination_folder);
-                // Get array of all source files
-                $files              = scandir($dir);
-                // Identify directories
-                // Cycle through all source files
-                foreach ($files as $file) {
-                    if (in_array($file, array(".",".."))) continue;
-                    // If we copied this successfully, mark it for deletion
-                    if (copy($dir.$file, $destination_folder.$file)) {
-                        $delete[] = $dir.$file;
-                    }
+                if (!empty($_SESSION['imgDir'])) {
+                    $row                = $sth->fetch(PDO::FETCH_LAZY);
+                    $lID                = $row['LastID'];
+                    $dir                = Session::get('imgDir');
+                    $destination_folder = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$lID.'\\';
+                    mkdir($destination_folder);
+                    // Get array of all source files
+                    $files              = scandir($dir);
+                    // Identify directories
+                    // Cycle through all source files
+                    foreach ($files as $file) {
+                        if (in_array($file, array(".",".."))) continue;
+                        // If we copied this successfully, mark it for deletion
+                        if (copy($dir.$file, $destination_folder.$file)) {
+                            $delete[] = $dir.$file;
+                        }
 
+                    }
+                    // Delete all successfully - copied files
+                    foreach ($delete as $file) {
+                        unlink($file);
+                    }
+                    rmdir($dir);
+                    unset($_SESSION['imgDir']);
+                    //echo '';
                 }
-                // Delete all successfully - copied files
-                foreach ($delete as $file) {
-                    unlink($file);
-                }
-                rmdir($dir);
-                unset($_SESSION['imgDir']);
-                //echo '';
+                echo 'OK';
             }
-            echo 'OK';
-            } 
             else
             echo 'Ошибка Добавлении!';
             $sth->closeCursor();
         }
-        else{
-			echo 'Вы забанены!';
-		}
+        else {
+            echo 'Вы забанены!';
+        }
 
     }
     public function lotfields()
     {
         echo '<input id="item_id" name="item_id" type="text" hidden/>';
-        /*<input id="lot_name" type="text" name="Titel" class="field-style field-full align-none" value="NAME" disabled/>
-        </li>';*/
         echo '<li><label class="form-label">Цена</label>
         <input name="price" type="text" class="field-style field-full align-none" pattern="\d{0,13}\,\d{2}" placeholder="Введите цену. Формат ***,**" required/>
         </li>';
@@ -218,10 +255,10 @@ echo str_replace(',','.',"123,3123");
     }
     public function createlot()
     {
-		 if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
-            $sth = $this->database->prepare("INSERT INTO Lots VALUES(NULL, :id, :price, :count, :datestart, :days, :active )");
+        if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
+            $sth   = $this->database->prepare("INSERT INTO Lots VALUES(NULL, :id, :price, :count, :datestart, :days, :active )");
             $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-            $price =str_replace(',','.',$_POST['price']);
+            $price = str_replace(',','.',$_POST['price']);
             if (        $sth->execute(array(
                         ':id' => $_POST['item_id'],
                         ':price' => $price,
@@ -229,16 +266,16 @@ echo str_replace(',','.',"123,3123");
                         ':datestart' => $_POST['date'],
                         ':days' => $_POST['days'],
                         ':active' => $_POST['active']
-                    )))                 	
-            	echo 'OK';
+                    )))
+            echo 'OK';
             else
-            	print_r($sth->errorInfo());
-            	//echo 'Ошибка Добавлении!';
+            print_r($sth->errorInfo());
+            //echo 'Ошибка Добавлении!';
             $sth->closeCursor();
         }
-        else{
-			echo 'Вы забанены!';
-		}
+        else {
+            echo 'Вы забанены!';
+        }
     }
     public function signup()
     {
@@ -253,7 +290,7 @@ echo str_replace(',','.',"123,3123");
         $thumb_prefix      = "thumb_"; //Normal thumb Prefix
         $uniqnum           = rand(1,time() / 5000);
         $destination_folder= realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\cache\\'.$uniqnum.'\\'; //upload directory ends with / (slash)
-       // Session::init();
+        // Session::init();
         Session::set('imgDir', $destination_folder);
         //create uniq folder
         mkdir($destination_folder);
