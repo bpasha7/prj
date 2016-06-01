@@ -1,23 +1,35 @@
 $(document).ready(function($){
         var URL = 'http://wts.dev/';
         var h = 0;
-        
-//==MENU===============================================
-$('#nav li a').click(function(){
-	var menuId = $(this).attr('rel');
-	if(menuId !== undefined)
-		{
-			
-		
-	$.ajax({
-                        url: URL+menuId,
-                        success: function(html){
-                            $('#content').html(html);
-                        }
-                    });
+
+        //==MENU===============================================
+        $('#nav li a').click(function(){
+                var menuId = $(this).attr('rel');
+                if(menuId !== undefined)
+                {
+                    $.ajax({
+                            url: URL+menuId,
+                            success: function(html){
+                                $('#content').html(html);
+                            }
+                        });
+                    switch(menuId){
+                        case 'menu/index':
+                        $.ajax({
+                                url: URL+'menu/top',
+                                success: function(html){
+                                    $('.plans').html(html);
+                                    //$('#item_id').val(lotId);
+                                }
+                            });
+                        break;
+
+                        default:
+                        break;
                     }
-});
-//====================================================
+                }
+            });
+        //====================================================
         //Logining
         $("#login_back").on('submit', '#loginForm', function(e){
                 var data = $(this).serialize();
@@ -75,7 +87,7 @@ $('#nav li a').click(function(){
                         success: function(html){
                             $('#form_fields').html(html);
                         }
-                    });           
+                    });
                 //return false;
             });
         //logout from control panel
@@ -257,12 +269,12 @@ $('#nav li a').click(function(){
                 switch(formName){
                     case 'reg':
                     if($('#pass1').val()!=$('#pass2').val())
-                    	{
-							alert('Пароли не совпадают, повторите ввод!');
-							$('#pass1').val('');
-							$('#pass2').val('');
-							return false;
-						}
+                    {
+                        alert('Пароли не совпадают, повторите ввод!');
+                        $('#pass1').val('');
+                        $('#pass2').val('');
+                        return false;
+                    }
                     $.ajax({
                             url: URL+'form/registration',
                             type: "POST",

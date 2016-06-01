@@ -19,6 +19,10 @@ class Menu extends Controller
 	{
 		$this->view->render('menu/rules', TRUE);
 	}
+	public function top()
+	{
+		$this->model->top();
+	}
 	public function other($arg = false)
 	{
 		//echo "1234";

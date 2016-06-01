@@ -4,6 +4,7 @@ class Database extends PDO
 	public function __construct($user='banned', $password)
 	{
 		parent::__construct("mysql:host=127.0.0.1;dbname=auction;charset=utf8", $user, $password);
+		$this->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
 		//header('Content-type: application/json; charset=utf-8');
 
 		//$db = new PDO('mysql:host=127.0.0.1;dbname=auction;charset=utf8', 'root', 'qwerty');

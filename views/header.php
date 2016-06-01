@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/panel.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/home.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/form.css">
+	<link rel="stylesheet" href="<?php echo URL; ?>public/css/plans.css">
 <!--	 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> -->
 	
 	<script type="text/javascript" src="<?php echo URL; ?>public/scripts/jquery-2.2.4.js"></script>

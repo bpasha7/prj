@@ -9,7 +9,7 @@
             Поиск
         </label>
         <input type="text" class="field small-field" />
-        <input type="submit" class="button" value="search" />
+        <input type="submit" class="button" value="Найти" />
     </div>
 </div>
 <!-- End Box Head -->
