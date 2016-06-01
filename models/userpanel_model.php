@@ -3,17 +3,14 @@ class UserPanel_Model extends Model
 {
     public function __construct()
     {
-        //Session::init();
-        //if(Session::get('Role'))
-        //{
-        parent::__construct();
-        //}
-
+        Session::init();
+        $role = Session::get('Role');
+        parent::__construct($role,'');
     }
     public function about()
     {
-        Session::init();
-        if (Session::get('loggedIn') == true) {
+        //Session::init();
+        if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
             $userid = Session::get('User');
             //How many items does user have
             $sth    = $this->database->prepare("SELECT COUNT(ItemId) AS cnt FROM items
@@ -46,13 +43,18 @@ class UserPanel_Model extends Model
             $sth->closeCursor();
         }
         else {
-
+            $info_array ['itemcount'] = '??';
+            $info_array ['lotcount'] = '??';
+            $info_array ['rub'] = '##.##';
+            $info_array ['dol'] = '##.##';
+            $info_array ['bon'] = '##.##';
+            echo json_encode($info_array);
         }
     }
     public function deleteitem($id)
     {
-        Session::init();
-        if (Session::get('loggedIn') == true) {
+        //Session::init();
+        if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
             $userid = Session::get('User');
             $sth    = $this->database->prepare("DELETE FROM items WHERE OwnerId = :userid AND ItemId = :itemid");
             if ($sth->execute(array(
@@ -63,7 +65,7 @@ class UserPanel_Model extends Model
                 $files = scandir($dir);
                 // Delete all successfully - copied files
                 foreach ($files as $file) {
-                	if (in_array($file, array(".",".."))) continue;
+                    if (in_array($file, array(".",".."))) continue;
                     unlink($dir.$file);
                 }
                 rmdir($dir);
@@ -74,12 +76,12 @@ class UserPanel_Model extends Model
             echo 'Ошибка БД';
         }
         else {
-            echo 'Ошибка удаления!';
+            echo 'Опция недоступна! Учетная запись ограничена в пользовании!';
         }
     }
     public function items()
     {
-        Session::init();
+        // Session::init();
         if (Session::get('loggedIn') == true) {
             $userid = Session::get('User');
             //How many items does user have
@@ -103,7 +105,7 @@ class UserPanel_Model extends Model
                     "\t<td><h3>".$row->ItemName."</h3></td>\n
                     \t<td>".$row->GroupName."</td>\n
                     \t<td>
-                    <a rel=\"".$row->ItemId."\" class=\"ico create\"><span class=\"tooltiptext\">Создать лот</span></a>
+                    <a rel=\"".$row->ItemId."\" name=\"".$row->ItemName."\" class=\"ico create\"><span class=\"tooltiptext\">Создать лот</span></a>
                     <a rel=\"".$row->ItemId."\" class=\"ico edit\"><span class=\"tooltiptext\">Изменить</span></a>
                     <a rel=\"".$row->ItemId."\" class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
                     $odd++;
@@ -122,7 +124,7 @@ class UserPanel_Model extends Model
     }
     public function lots()
     {
-        Session::init();
+        //Session::init();
         if (Session::get('loggedIn') == true) {
             $userid = Session::get('User');
             //How many items does user have

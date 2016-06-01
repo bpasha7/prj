@@ -3,25 +3,19 @@ class Form_Model extends Model
 {
     public function __construct()
     {
-        parent::__construct();
+    	Session::init(); 
+    	$role = Session::get('Role');
+        parent::__construct($role,'');       
     }
-    public function about()
+    public function test()
     {
-        /*Session::init();
-        if(Session::get('loggedIn') == true)
-        {
-        $userid = Session::get('User');
-        //How many items does user have
-        $sth = $this->database->prepare("SELECT COUNT(ItemId) AS cnt FROM items
-        WHERE OwnerId = :userid");
-        $sth->execute(array(
-        ':userid'=> $userid
-        ));
-        }*/
+
+echo str_replace(',','.',"123,3123");
+        
     }
     public function groups()
     {
-        Session::init();
+        //Session::init();
         if (Session::get('loggedIn') == true) {
             //$userid = Session::get('User');
             //How many items does user have
@@ -42,15 +36,11 @@ class Form_Model extends Model
     }
     public function fields($arg)
     {
-        Session::init();
+       // Session::init();
         if (Session::get('loggedIn') == true && $arg != false) {
             $userid = Session::get('User');
-            //$group = $arg;//$_POST['grp'];
-
             $params = array();
             $paramsname = array();
-            //$paramsname[] = 'Titel';
-
             $sth   = $this->database->prepare("CALL ColsName( $arg, 1)");
             $sth->execute();
 
@@ -109,7 +99,7 @@ class Form_Model extends Model
                 </div>
                 </div>';
                 echo '<li>
-                <input type="submit" id="smt" value="Создать" />
+                <input id="submit_form" name="item" type="submit" id="smt" value="Создать" />
                 </li>';
             }
         }
@@ -117,8 +107,9 @@ class Form_Model extends Model
     }
     public function createitem()
     {
-        Session::init();
-        if (Session::get('loggedIn') == true) {
+       // Session::init();
+
+        if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
             $paramsname = array();
             $data = array();
             $grp   = $_POST['group'];
@@ -145,12 +136,13 @@ class Form_Model extends Model
             $d   = json_encode($data);
             //echo $d;
             $sth = $this->database->prepare("CALL NewItem( :owner, :grp, :titel, :data )");
-            if ($sth->execute(array(
+            if (        $sth->execute(array(
                         ':owner' => Session::get('User'),
                         ':grp' => $grp,
                         ':titel' => $_POST['Titel'],
                         ':data' => $d
                     ))) {
+                    	if (!empty($_SESSION['imgDir'])){
                 $row                = $sth->fetch(PDO::FETCH_LAZY);
                 $lID                = $row['LastID'];
                 $dir                = Session::get('imgDir');
@@ -173,26 +165,32 @@ class Form_Model extends Model
                     unlink($file);
                 }
                 rmdir($dir);
-                echo 'OK';
-
+                unset($_SESSION['imgDir']);
+                //echo '';
             }
+            echo 'OK';
+            } 
             else
             echo 'Ошибка Добавлении!';
             $sth->closeCursor();
         }
+        else{
+			echo 'Вы забанены!';
+		}
+
     }
     public function lotfields()
     {
-        echo '<li><label class="form-label">Название объявления</label>
-        <input type="text" name="Titel" class="field-style field-full align-none" value="NAME" disabled/>
-        </li>';
+        echo '<input id="item_id" name="item_id" type="text" hidden/>';
+        /*<input id="lot_name" type="text" name="Titel" class="field-style field-full align-none" value="NAME" disabled/>
+        </li>';*/
         echo '<li><label class="form-label">Цена</label>
-        <input name="price" type="text" class="field-style field-full align-none" placeholder="Введите цену" />
+        <input name="price" type="text" class="field-style field-full align-none" pattern="\d{0,13}\,\d{2}" placeholder="Введите цену. Формат ***,**" required/>
         </li>';
         echo '<li><label class="form-label">Количество</label>
-        <input name="count" type="text" class="field-style field-full align-none" placeholder="Введите число экземпляров" />
+        <input name="count" type="text" class="field-style field-full align-none" pattern="^[ 0-9]+$" placeholder="Введите число экземпляров" required/>
         </li>';
-        echo '<li><label name="price" class="form-label">Начало торгов</label>
+        echo '<li><label class="form-label">Начало торгов</label>
         <input name="date" type="date" class="field-style field-split align-left" placeholder="Выберите начало торгов"/>
         </li>';
         echo '<li><div class="styled-select">
@@ -215,12 +213,32 @@ class Form_Model extends Model
         }
         $sth->closeCursor();
         echo '</select></div><li>
-        <input type="submit" value="Создать" />
+        <input id="submit_form" name="lot" type="submit" value="Создать" />
         </li>';
     }
     public function createlot()
     {
-
+		 if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
+            $sth = $this->database->prepare("INSERT INTO Lots VALUES(NULL, :id, :price, :count, :datestart, :days, :active )");
+            $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+            $price =str_replace(',','.',$_POST['price']);
+            if (        $sth->execute(array(
+                        ':id' => $_POST['item_id'],
+                        ':price' => $price,
+                        ':count' => $_POST['count'],
+                        ':datestart' => $_POST['date'],
+                        ':days' => $_POST['days'],
+                        ':active' => $_POST['active']
+                    )))                 	
+            	echo 'OK';
+            else
+            	print_r($sth->errorInfo());
+            	//echo 'Ошибка Добавлении!';
+            $sth->closeCursor();
+        }
+        else{
+			echo 'Вы забанены!';
+		}
     }
     public function signup()
     {
@@ -235,7 +253,7 @@ class Form_Model extends Model
         $thumb_prefix      = "thumb_"; //Normal thumb Prefix
         $uniqnum           = rand(1,time() / 5000);
         $destination_folder= realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\cache\\'.$uniqnum.'\\'; //upload directory ends with / (slash)
-        Session::init();
+       // Session::init();
         Session::set('imgDir', $destination_folder);
         //create uniq folder
         mkdir($destination_folder);

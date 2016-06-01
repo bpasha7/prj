@@ -1,7 +1,7 @@
 ﻿<?php
 class Database extends PDO
 {
-	public function __construct($user = 'client', $password = '')
+	public function __construct($user='banned', $password)
 	{
 		parent::__construct("mysql:host=127.0.0.1;dbname=auction;charset=utf8", $user, $password);
 		//header('Content-type: application/json; charset=utf-8');

@@ -17,11 +17,14 @@ class Form extends Controller
    	public function fields($arg = false)
    	{
 		$this->model->fields($arg);
-	}
-	
+	}	
 	public function createitem()
    	{
 		$this->model->createitem();
+	}
+	public function createlot()
+   	{
+		$this->model->createlot();
 	}
 	public function upload()
 	{
@@ -30,6 +33,10 @@ class Form extends Controller
 	public function lotfields()
 	{
 		$this->model->lotfields();
+	}
+	public function test()
+	{
+		$this->model->test();
 	}
 
 }

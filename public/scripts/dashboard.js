@@ -37,29 +37,11 @@ $('body').delegate('#menu_login', 'click', function(){
             });
         return false;
     });
-//load items table
-/*$('body').delegate('#my_items', 'click', function(){
-$( "#userbar_content" ).empty();
-$.ajax({
-url: URL+'userpanel/index',
-success: function(html){
-$("#userbar_content").html(html);
-}
+//Hide login back
+$("#login_back").click(function(e){
+	if(e.target == this)
+  $(this).fadeOut("fast");
 });
-return false;
-});   */
-//load lots table
-/*$('#my_lots').click(function(){
-//$( "#userbar_content" ).empty();
-$.ajax({
-url: URL+'userpanel/index',
-success: function(html){
-$("#userbar_content").html(html);
-}
-});
-return false;
-});
-*/
 //logout from control panel
 $("#logout").click(function(e){
         var returnVal = confirm("Выйти из учетной записи?");
@@ -167,14 +149,14 @@ $('#my_items').click(function(e){
             });
         //Create lot
         $("#userbar_content").on('click','a.ico.create', function(){
-                //delItem = $(this);
-                //var id = $(this).attr('rel');
-                if(confirm("Перейти к созданию лота?")){
+        	var lotName = $(this).attr('name');
+        	var lotId = $(this).attr('rel');
+                if(confirm("Перейти к созданию лота <"+lotName+">?")){
                     $.ajax({
                             url: URL+'form',
                             success: function(html){
                                 $('#content').html(html);
-                                $('#form_titel').text('Создание лота');
+                                $('#form_titel').text('Создание лота<' + lotName +'>');                              
                                 $('#open_userbar').click();
                             }
                         });
@@ -182,6 +164,9 @@ $('#my_items').click(function(e){
                             url: URL+'form/lotfields',
                             success: function(html){
                                 $('#form_fields').html(html);
+                                $('#item_id').val(lotId);
+                                //$('#lot_name').attr('rel') = '234';
+                                //$('#lot_name').val(lotName);
                             }
                         });
                     return false;
@@ -191,9 +176,7 @@ $('#my_items').click(function(e){
         $("#userbar_content").on('click','#new_item', function(){
                 newItem = $(this);
                 var form = $(this).attr('rel');
-                //===
                 $( "#content" ).empty();
-                //$( ".back" ).show();
                 $.ajax({
                         url: URL+form,
                         success: function(html){
@@ -207,7 +190,8 @@ $('#my_items').click(function(e){
             });
 
 
-        //ITEM===FORM==============================
+        //===FORMS==============================
+        //Loading groups
         $('#content').on('focus','#groups', function(){
                 //$( "#groups" ).empty();
                 $.ajax({
@@ -217,6 +201,7 @@ $('#my_items').click(function(e){
                         }
                     });
             });
+            //Selecting group
         $('#content').on('change','#groups', function(){
                 var id = $('#groups').val();
                 $.ajax({
@@ -228,9 +213,31 @@ $('#my_items').click(function(e){
                         }
                     });
             });
+            //Submitting forms
         $('#content').on('submit','#create_form', function(){
+        	//if lot or item
                 var data = $(this).serialize();
-                $.ajax({
+                var formName = $('#submit_form').attr('name');
+                switch(formName){
+					case 'lot':
+					$.ajax({
+                        url: URL+'form/createlot',
+                        type: "POST",
+                        data: data,
+                        success: function(res){
+                            if(res == 'OK'){
+                                alert('Лот Успешно создан');
+                                $('#content').empty();
+                                $('html, body').animate({scrollTop:0}, 'slow');
+                            }
+                            else{
+                                alert(res);
+                            }
+                        }
+                    });
+						break;
+					case 'item':
+					$.ajax({
                         url: URL+'form/createitem',
                         type: "POST",
                         data: data,
@@ -245,6 +252,12 @@ $('#my_items').click(function(e){
                             }
                         }
                     });
+						break;
+					
+					default:
+						break;
+				}
+                
             });
         //===========UPLOADING=======================
         var progressbox     = $('#progressbox');
