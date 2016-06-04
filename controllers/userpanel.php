@@ -5,7 +5,7 @@ class UserPanel extends Controller
 	{
 		parent::__construct();
 	}
-	public function index($tname = false)
+	public function index()
 	{
 		$this->view->render('userpanel/panel', true);
 	}

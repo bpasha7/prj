@@ -150,7 +150,7 @@ class UserPanel_Model extends Model
                     echo
                     "\t<td><h3>".$row->ItemName."</h3></td>\n
                     \t<td>".$row->Group."</td>\n
-                    \t<td>".$row->Price."</td>\n
+                    \t<td>". number_format( str_replace(',','.',$row->Price), 2 )."&#8381</td>\n
                     \t<td>".$row->Created."</td>\n
                     \t<td>".$row->PrName."</td>\n
                     \t<td>

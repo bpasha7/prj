@@ -13,13 +13,10 @@ class Form_Model extends Model
     }
     public function test()
     {
-        $role = Session::get('Role');
-        echo $role;
-        $pas = '12345';
-        $md  = md5($pas);
-        $bs  = base64_encode($pas);
-        $bm  = base64_encode($md);
-        echo $pas. '+ '. $md. ' + '. $bs. ' + '. $bm;
+    	$myNumber = 123456.78;
+
+		echo number_format( $myNumber, 2 );
+
     }
     public function groups()
     {
@@ -32,7 +29,7 @@ class Form_Model extends Model
         }
         $count = $sth->rowCount();
         if ($count > 0) {
-            echo "<option>Выберите пожалуйста группу...</option>";
+            echo "<option disabled>Выберите пожалуйста группу...</option>";
             while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
                 echo '<option value="'.$row['GroupId'].'">' . $row['GroupName'] . "</option>";
             }
@@ -187,6 +184,7 @@ class Form_Model extends Model
                     $dir                = Session::get('imgDir');
                     $destination_folder = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$lID.'\\';
                     mkdir($destination_folder);
+                    mkdir($destination_folder. "thumb\\");
                     // Get array of all source files
                     $files              = scandir($dir);
                     // Identify directories
@@ -194,6 +192,10 @@ class Form_Model extends Model
                     foreach ($files as $file) {
                         if (in_array($file, array(".",".."))) continue;
                         // If we copied this successfully, mark it for deletion
+                        if(stripos($file, 'thumb_')!== false && copy($dir.$file, $destination_folder."thumb\\".$file)){
+							$delete[] = $dir.$file;
+							continue;
+						}
                         if (copy($dir.$file, $destination_folder.$file)) {
                             $delete[] = $dir.$file;
                         }
@@ -232,7 +234,7 @@ class Form_Model extends Model
         </li>';
         echo '<li><div class="styled-select">
         <select name="days" >
-        <option value="">Выберите длительность...</option>
+        <option value="" disabled>Выберите длительность...</option>
         <option value="7">7 Дней (Неделя)</option>
         <option value="14">14 Дней (Две недели)</option>
         <option value="30">30 Дней (Месяц)</option>
@@ -294,6 +296,7 @@ class Form_Model extends Model
         Session::set('imgDir', $destination_folder);
         //create uniq folder
         mkdir($destination_folder);
+       // mkdir($destination_folder . "thumb\\");
         $jpeg_quality      = 90; //jpeg quality
         $count             = 1;
         ##########################################

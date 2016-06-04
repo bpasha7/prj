@@ -15,6 +15,8 @@
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/home.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/form.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/plans.css">
+	<link rel="stylesheet" href="<?php echo URL; ?>public/css/lot.css">
+	<link rel="stylesheet" href="<?php echo URL; ?>public/css/chat.css">
 <!--	 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> -->
 	
 	<script type="text/javascript" src="<?php echo URL; ?>public/scripts/jquery-2.2.4.js"></script>
@@ -32,6 +34,7 @@
 </head>
 <body>
 <?php Session::init(); ?>
+<img id="logo" src="<?php echo URL; ?>public/images/logo.png"/>
 <input class="open" id="top-box" type="checkbox" hidden>
        <label id="open_userbar" class="btn" for="top-box"  <?php if(Session::get('loggedIn') == true) echo 'style="visibility: visible;"'?>> <?php if(Session::get('loggedIn') == true) echo Session::get('UserName')?></label>
         <div id="tst" class="top-panel">
@@ -73,3 +76,4 @@
 <!--</div>-->
 <div id="content">
 </div>
+

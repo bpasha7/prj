@@ -1,4 +1,6 @@
 .form-style {
+	top: 2%;
+    position: relative;
     width: 75%;
     background: #FAFAFA;
     padding: 30px;

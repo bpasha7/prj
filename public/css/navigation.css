@@ -1,7 +1,14 @@
-﻿#container {
+﻿.topWindow {
+	opacity: 0.95;
+    position: fixed;
+    top: -15.3%;
+    z-index:9;
+        left: 2.8%;
+        
+    }
+#container {
 	width: 95%;
     margin: 10% auto;
-
 }
 
 #container ul, li {
