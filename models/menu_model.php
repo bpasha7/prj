@@ -47,6 +47,7 @@ class Menu_Model extends Model
                 default: break;
             }
         }
+        
         $sth->closeCursor();
     }
 }

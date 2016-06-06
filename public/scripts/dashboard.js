@@ -29,93 +29,142 @@ $(document).ready(function($){
                     }
                 }
             });
-            //==StickMenu=====================
-        var MenuStick = $("#container"); //Получаем нужный объект
+        //==StickMenu=====================
+        /* var MenuStick = $("#container"); //Получаем нужный объект
         var topOfMenuStick = $(MenuStick).offset().top; //Получаем начальное расположение нашего блока
 
         $(window).scroll(function () {
-            var windowScroll = $(window).scrollTop(); //Получаем величину, показывающую на сколько прокручено окно
+        var windowScroll = $(window).scrollTop(); //Получаем величину, показывающую на сколько прокручено окно
 
-            if (windowScroll > topOfMenuStick) { // Если прокрутили больше, чем расстояние до блока, то приклеиваем его
-                $(MenuStick).addClass("topWindow");
-            } else {
-                $(MenuStick).removeClass("topWindow");
-            };
-        });
+        if (windowScroll > topOfMenuStick) { // Если прокрутили больше, чем расстояние до блока, то приклеиваем его
+        $(MenuStick).addClass("topWindow");
+        } else {
+        $(MenuStick).removeClass("topWindow");
+        };
+        });*/
         //====================================================
         //===Lot script====
-                $("#content").on('click','a.plan-button', function(){
+        $("#content").on('click','a#writeto', function(){
+                var who = $(this).attr('rel');
+                $('#typing_text').text(who+', ');
+                $('#typing_text').focus();
+
+            });
+        $("#content").on('click','#sent_msg', function(){
+        	var message = {
+				'msg' : $('#typing_text').val(),
+				'lot': $(this).attr('lot')
+			};
+			var t = JSON.stringify(message)
+                $.ajax({
+                        url: URL+'lot/addcomment',
+                        type: "POST",
+                        data:  message,
+                        success: function(html){
+                        	if(html!='NO')
+                            	$('#content2').html(html);
+                           	else
+                           		alert('Не получилось отправить!');
+                            // $('#form_titel').text('Создание лота<' + lotName +'>');
+                            //$('#open_userbar').click();
+                        }
+                    });
+
+            });
+            $("#content").on('click','.rating span', function(){
+        	var stars = {
+				'count' : $(this).attr('starnum'),
+				'comment': $(this).parent().attr('coment'),
+				'lot': $('.rating').attr('lot')			
+			};
+			var t = JSON.stringify(stars);
+                $.ajax({
+                        url: URL+'lot/addstars',
+                        type: "POST",
+                        data:  stars,
+                        success: function(html){
+                        	if(html!='NO')
+                            	$('#content2').html(html);
+                           	else
+                           		alert('Вы не можете оценить!');
+                            // $('#form_titel').text('Создание лота<' + lotName +'>');
+                            //$('#open_userbar').click();
+                        }
+                    });
+
+            });
+        $("#content").on('click','a.plan-button', function(){
                 var ItemId = $(this).attr('rel');
                 var LotId = $(this).attr('lot');
-                    $.ajax({
-                            url: URL+'lot/index/'+ItemId+':'+LotId,
-                            success: function(html){
-                                $('#content').html(html);
-                               // $('#form_titel').text('Создание лота<' + lotName +'>');
-                                //$('#open_userbar').click();
-                            }
-                        });
-                   /* $.ajax({
-                            url: URL+'form/lotfields',
-                            success: function(html){
-                                $('#form_fields').html(html);
-                                $('#item_id').val(lotId);
-                                //$('#lot_name').attr('rel') = '234';
-                                //$('#lot_name').val(lotName);
-                            }
-                        });*/
+                $.ajax({
+                        url: URL+'lot/index/'+ItemId+':'+LotId,
+                        success: function(html){
+                            $('#content').html(html);
+                            // $('#form_titel').text('Создание лота<' + lotName +'>');
+                            //$('#open_userbar').click();
+                        }
+                    });
+                /* $.ajax({
+                url: URL+'form/lotfields',
+                success: function(html){
+                $('#form_fields').html(html);
+                $('#item_id').val(lotId);
+                //$('#lot_name').attr('rel') = '234';
+                //$('#lot_name').val(lotName);
+                }
+                });*/
             });
-            $("#content").on('click','#slider img', function(e){
-            	var Imgid = $(this).attr('rel');
-            	$('#images').animate({   
-            	opacity: 0
-            	}, 
-            	500, function(){
-					$('#images').children().hide();
-            		$('#'+Imgid).show();
-				}            	
-            	);
-            	$('#images').animate({   
-            	opacity: 1
-            	}, 
-            	500);
+        $("#content").on('click','#slider img', function(e){
+                var Imgid = $(this).attr('rel');
+                $('#images').animate({
+                        opacity: 0
+                    },
+                    500, function(){
+                        $('#images').children().hide();
+                        $('#'+Imgid).show();
+                    }
+                );
+                $('#images').animate({
+                        opacity: 1
+                    },
+                    500);
             });
         //Нажатие на картинку
-					$('#images').children().click(function()
-						{
-							//var l = $('#images').children().length;
-							var clickedimg = event.target.id;
-							/*var imgarr =[];
-							for(i=0;i<l;i++){
-							var imgset = {};
-							imgset.id = "image"+i.toString();
-							imgset.imgfull = "i"+i.toString();
-							imgarr.push(imgset);
-							}*/
-							var at =$('#'+clickedimg.toString()).prop('src');
-							//at= at.substr(19, at.legth);
-							$("#f").attr("src",at);
-							$("#grey_screen").css('display','block');
-							//$("#f").css('display','block');
-							$('#imgboard').show();
-							//$("#images").hide();
-							//$("#slider").hide();
-							//$('#f').attr('src', $('3f').attr('src').
-							//$('#'+clickedimg.toString()+'f').show();
-						});
+        $('#images').children().click(function()
+            {
+                //var l = $('#images').children().length;
+                var clickedimg = event.target.id;
+                /*var imgarr =[];
+                for(i=0;i<l;i++){
+                var imgset = {};
+                imgset.id = "image"+i.toString();
+                imgset.imgfull = "i"+i.toString();
+                imgarr.push(imgset);
+                }*/
+                var at =$('#'+clickedimg.toString()).prop('src');
+                //at= at.substr(19, at.legth);
+                $("#f").attr("src",at);
+                $("#grey_screen").css('display','block');
+                //$("#f").css('display','block');
+                $('#imgboard').show();
+                //$("#images").hide();
+                //$("#slider").hide();
+                //$('#f').attr('src', $('3f').attr('src').
+                //$('#'+clickedimg.toString()+'f').show();
+            });
 
-					$("#grey_screen").click(function(e)
-						{
-							//$(".menu .active").removeClass();
-							$('#grey_screen').css('display','none');
-							$('#imgboard').hide();
-							//$("#images").show();
-							//$("#slider").show();
-							//$("#main_page").addClass("active");
-						});
+        $("#grey_screen").click(function(e)
+            {
+                //$(".menu .active").removeClass();
+                $('#grey_screen').css('display','none');
+                $('#imgboard').hide();
+                //$("#images").show();
+                //$("#slider").show();
+                //$("#main_page").addClass("active");
+            });
         //=====
         //===item description
-        
+
         //Logining
         $("#login_back").on('submit', '#loginForm', function(e){
                 var data = $(this).serialize();
@@ -269,14 +318,14 @@ $(document).ready(function($){
             });
         //delete items by click
         $("#userbar_content").on('click','a.ico.del', function(){
-                delItem = $(this);
+                var obj =  $(this).attr('name');
                 var id = $(this).attr('rel');
                 if(confirm("Подтвердите удаление...")){
                     $.ajax({
-                            url: URL+'userpanel/deleteitem/'+id,
+                            url: URL+'userpanel/delete'+obj+'/'+id,
                             success: function(html){
                                 alert(html);
-                                $('#my_items').click();
+                                $('#my_'+obj+'s').click();
                             }
                         });
                 }

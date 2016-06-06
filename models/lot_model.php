@@ -14,11 +14,6 @@ class Lot_Model extends Model
     public function images($id)
     {
         echo '
-        <div id="grey_screen">
-        </div>
-        <div id="imgboard" hidden="">';
-        echo '<img id="f" src="#"/>
-        </div>
         <div id="images">';
         $dir = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$id.'\\';
         $dh  = opendir($dir);
@@ -44,11 +39,12 @@ class Lot_Model extends Model
 
         }
         echo '</div>';
+        
 
     }
-    public function about($id)
+    public function about($id, $lot)
     {
-        echo '<section class="tabs">
+        /*echo '<section class="tabs">
         <input id="tab-1" type="radio" name="radio-set" class="tab-selector-1" checked="checked" />
         <label for="tab-1" class="tab-label-1">
         Описание
@@ -72,7 +68,18 @@ class Lot_Model extends Model
 
         <div id="m_content" class="contents">
 
-        <div class="content-1">';
+        <div class="content-1">';*/
+        echo '
+        <div class="tabs">
+        <input id="tab1" type="radio" name="tabs" checked hidden>
+        <label for="tab1" >Описание</label>
+
+        <input id="tab2" type="radio" name="tabs" hidden>
+        <label for="tab2" >Вопросы</label>
+
+        <input id="tab3" type="radio" name="tabs" hidden>
+        <label for="tab3" >Продавец</label>
+        <section id="content1">';
 
         $sth     = $this->database->prepare("CALL GetItemInfo( $id )");
         $sth->execute();
@@ -111,139 +118,131 @@ class Lot_Model extends Model
             $skiping++;
         }
         $sth->closeCursor();
-        echo '</div>
-
-        <div class="content-2">
+        echo '</section>
+        <section id="content2">';
+        $this->comments($lot);
+        echo '</section>
+        <section id="content3">
+        </section>
         </div>
-        <!-- <div class="content-3">
-        <h2>Portfolio</h2>
-        <p></p>
-        <h3>Examples</h3>
-        <p></p>
-        </div>-->
-        <div class="content-4">
-        <h2>
-        Контакты
-        </h2>
-        <p>
-        </p>
-        <h3>
-        Get in touch
-        </h3>
-        <p>
-        </p>
-        </div>
-        </div>
-        </section>';
+        ';
     }
     public function owner()
     {
 
     }
-    public function  comments($id)
+    public function  comments($lot)
     {
-    	
-    	$sth      = $this->database->prepare("SELECT Lotscoments WHERE Lot = ");
+
+        $sth = $this->database->prepare("SELECT * FROM Lotscoments WHERE Lot = $lot");
         $sth->execute();
-        $cls_type = 0;
-        while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
-        	}
-       /* echo '<div class="chat">
+        //$cls_type = 0;
+        echo '<div class="chat">
         <div class="body">
 
-        <ul>
-        <li class="question">
-        <a class="thumbnail">
-        NR
-        </a>
-        <div class="message">
-        <h3>'..'</h3>
-        <span class="preview">'..'</span>
-        <span class="meta">
-        '..' &middot;
-        <a href="">Ответить</a>
-        </span>
-        <div coment="'..'" class="rating">
-        <span starnum="5">&#9733</span><span starnum="4">&#9734</span><span starnum="3">&#9734</span><span starnum="2">&#9734</span><span starnum="1">&#9734</span>
-        </div>
-        </div>
-        </li>';
-        <li class="answer">
-        <a class="thumbnail" href="#">
-        NR
-        </a>
-        <div class="content">
-        <h3>Nick Roach</h3>
-        <span class="preview">hey how are things going on the...</span>
-        <span class="meta">
-        2h ago &middot;
-        <a href="#">Category</a>
-        &middot;
-        <a href="#">Reply</a>
-        </span>
-        </div>
-        </li>
-        <li>
-        <a class="thumbnail" href="#">
-        NR
-        </a>
-        <div class="content">
-        <h3>Nick Roach</h3>
-        <span class="preview">hey how are things going on the...</span>
-        <span class="meta">
-        2h ago &middot;
-        <a href="#">Category</a>
-        &middot;
-        <a href="#">Reply</a>
-        </span>
-        </div>
-        </li>
-        <li>
-        <a class="thumbnail" href="#">
-        NR
-        </a>
-        <div class="content">
-        <h3>Nick Roach</h3>
-        <span class="preview">hey how are things going on the...</span>
-        <span class="meta">
-        2h ago &middot;
-        <a href="#">Category</a>
-        &middot;
-        <a href="#">Reply</a>
-        </span>
-        </div>
-        </li>      <li>
-        <a class="thumbnail" href="#">
-        NR
-        </a>
-        <div class="content">
-        <h3>Nick Roach</h3>
-        <span class="preview">hey how are things going on the...</span>
-        <span class="meta">
-        2h ago &middot;
-        <a href="#">Category</a>
-        &middot;
-        <a href="#">Reply</a>
-        </span>
-        </div>
-        </li>      <li>
-        <a class="thumbnail" href="#">
-        NR
-        </a>
-        <div class="content">
-        <h3>Nick Roach</h3>
-        <span class="preview">hey how are things going on the...</span>
-        <span class="meta">
-        2h ago &middot;
-        <a href="#">Category</a>
-        &middot;
-        <a href="#">Reply</a>
-        </span>
-        </div>
-        </li>*/
+        <ul>';
+        while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
+
+            echo '<li class="question">
+            <a class="thumbnail">
+            '.$row['Nicname'].'
+            </a>
+            <div class="msg">
+            <h3>'.$row['UserName'].'</h3>
+            <span class="preview">'.$row['Message'].'</span>
+            <span class="meta">
+            '.$row['When'].' &middot;
+            <a id="writeto" rel="'.$row['UserName'].'">Ответить</a>
+            </span>
+            <div coment="'.$row['ID'].'" lot="'.$lot.'" class="rating">';
+            if ($row['voices'] == 1)
+            $stars = 0;
+            else
+            	$stars = ceil($row['Stars'] / ($row['voices']-1));
+            switch ($stars) {
+                case 1:
+                echo '<span starnum = "5">&#9734</span><span starnum = "4">&#9734</span><span starnum = "3">&#9734</span><span starnum = "2">&#9734</span><span starnum = "1">&#9733</span >';
+                break;
+                case 2:
+                echo '<span starnum = "5">&#9734</span><span starnum = "4">&#9734</span><span starnum = "3">&#9734</span><span starnum = "2">&#9733</span><span starnum = "1">&#9733</span >';
+                break;
+                case 3:
+                echo '<span starnum = "5">&#9734</span><span starnum = "4">&#9734</span><span starnum = "3">&#9733</span><span starnum = "2">&#9733</span><span starnum = "1">&#9733</span >';
+                break;
+                case 4:
+                echo '<span starnum = "5">&#9734</span><span starnum = "4">&#9733</span><span starnum = "3">&#9733</span><span starnum = "2">&#9733</span><span starnum = "1">&#9733</span >';
+                break;
+                case 5:
+                echo '<span starnum = "5">&#9733</span><span starnum = "4">&#9733</span><span starnum = "3">&#9733</span><span starnum = "2">&#9733</span><span starnum = "1">&#9733</span >';
+                break;
+                default:             
+                echo '<span starnum = "5">&#9734</span><span starnum = "4">&#9734</span><span starnum = "3">&#9734</span><span starnum = "2">&#9734</span><span starnum = "1">&#9734</span >';
+                break;
+            }
+            echo '</div>
+            </div>';
+            if($row['UserId'] == Session::get('User'))
+            	echo '<img class="del" src ="http://wts.dev//public/images/del.png" rel="'.$row['ID'].'" /img>';
+           echo '</li>';
+        }
         echo '</ul>
         </div>
+        <div class="type_msg">
+        <textarea id="typing_text" type="text" class="field-type" placeholder="Введите собщение"/>
+        <input id="sent_msg" lot="'.$lot.'"class="msg_submit" type="submit"  value="Задать" />
+        </div>
         </div>';
+        $sth->closeCursor();
+    }
+    public function addcomment()
+    {
+        if (Session::get('loggedIn') == true) {
+            //$userid = Session::get('User');
+            //How many items does user have
+            $sth = $this->database->prepare("CALL addcoment(:msg, :userid, :lot)");
+            $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+            if (        $sth->execute(array(
+                        ':msg' => $_POST['msg'],
+                        ':userid' => Session::get('User'),
+                        ':lot' => $_POST['lot']
+                    )))
+            $this->comments($_POST['lot']);
+            //echo 'OK';
+            else
+            print_r($sth->errorInfo());//echo 'Ошибка создания учетной записи!';
+        }
+        else
+        echo 'Вы не авторизованы!';
+        $sth->closeCursor();
+    }
+    public function addstars()
+    {
+        if (Session::get('loggedIn') == true) {
+            //$userid = Session::get('User');
+            //How many items does user have
+            $sth = $this->database->prepare("CALL addstars(:coment, :count, :userid )");
+            $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+            $sth->execute(array(
+                    ':coment'=> $_POST['comment'],
+                    ':count' => $_POST['count'],
+                    ':userid'=> Session::get('User'),
+                ));
+                $res = $sth->fetch(PDO::FETCH_ASSOC);
+                $status = $res['RESULT'];
+               // echo $res['RESULT'];
+                $sth->closeCursor();
+            if ( $status != 0 )
+            {
+            	$this->comments($_POST['lot']);
+            	
+            }
+            //echo 'OK';
+            else
+            echo 'NO';
+        }
+        else
+        echo 'Вы не авторизованы!';
+        //$sth->closeCursor();
     }
 }
 ?>

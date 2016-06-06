@@ -79,6 +79,24 @@ class UserPanel_Model extends Model
             echo 'Опция недоступна! Учетная запись ограничена в пользовании!';
         }
     }
+    public function deletelot($id)
+    {
+        //Session::init();
+        if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
+            $userid = Session::get('User');
+            $sth    = $this->database->prepare("DELETE FROM lots WHERE LotId = :lotid");
+            if ($sth->execute(array(
+                        ':lotid'=>$id
+                    ))) {
+                echo 'Лот удален';
+            }
+            else
+            echo 'Ошибка БД';
+        }
+        else {
+            echo 'Опция недоступна! Учетная запись ограничена в пользовании!';
+        }
+    }
     public function items()
     {
         // Session::init();
@@ -107,7 +125,7 @@ class UserPanel_Model extends Model
                     \t<td>
                     <a rel=\"".$row->ItemId."\" name=\"".$row->ItemName."\" class=\"ico create\"><span class=\"tooltiptext\">Создать лот</span></a>
                     <a rel=\"".$row->ItemId."\" class=\"ico edit\"><span class=\"tooltiptext\">Изменить</span></a>
-                    <a rel=\"".$row->ItemId."\" class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
+                    <a name=\"item\" rel=\"".$row->ItemId."\" class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
                     $odd++;
                 }
                 //echo "</tbody > ";
@@ -154,8 +172,8 @@ class UserPanel_Model extends Model
                     \t<td>".$row->Created."</td>\n
                     \t<td>".$row->PrName."</td>\n
                     \t<td>
-                    <a href=\"#\" class=\"ico edit\"><span class=\"tooltiptext\">Изменить</span></a>
-                    <a href=\"#\" class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
+                    <a  class=\"ico edit\"><span class=\"tooltiptext\">Изменить</span></a>
+                    <a  name=\"lot\" rel=\"".$row->LotId."\"class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
                     $odd++;
                 }
                 //echo "</tbody > ";

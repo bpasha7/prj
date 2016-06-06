@@ -29,6 +29,10 @@ class UserPanel extends Controller
 	{
 		$this->model->deleteitem($id);
 	}
+	public function deletelot($id)
+	{
+		$this->model->deletelot($id);
+	}
 	//удаление лота
 
 }

@@ -22,6 +22,7 @@ class Menu extends Controller
 	public function top()
 	{
 		$this->model->top();
+		//echo '<div class="clear_content"></div>';
 	}
 	public function other($arg = false)
 	{

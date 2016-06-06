@@ -8,6 +8,19 @@
     width: 1.1em;
     color: gold;
 }
+.field-type{
+	    width: 50%;
+    height: 20%;
+    border-radius: 12px;
+    border-color: #009933;
+}
+.msg_submit{
+	display: block;
+	color: #009933;
+	border-radius: 5px;
+	background: #f2f2f2;
+	font: 16px;
+}
 .rating > span:hover:before,
 .rating > span:hover ~ span:before {
     content: "\2605";
@@ -18,9 +31,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: #ffffff;
-    width: 43%;
+   /* width: 43%;*/
     height: 42%;
-    margin: 0 auto;
+    margin: 2% auto;
     position: inherit;
     top: 39%;
     left: 21%;
@@ -39,7 +52,7 @@
     clear: both;
 }
 .chat header h2,
-.chat .body ul li .messasge h3 {
+.chat .body ul li .msg h3 {
     margin: 0;
     padding: 0;
     font-size: 14px;
@@ -73,7 +86,7 @@
 }
 .chat .body {
     position: relative;
-    max-height: 360px;
+    max-height: 80%;
     overflow-y: scroll;
 }
 ::-webkit-scrollbar {
@@ -157,35 +170,36 @@
 .chat .body ul li .thumbnail img {
     width: 100%;
 }
-.chat .body ul li .messasge {
+.chat .body ul li .msg {
+	margin: 1%;
     display: inline-block;
     margin-left: 6px;
     vertical-align: top;
     line-height: 1;
 }
-.chat .body ul li .messasge h3 {
+.chat .body ul li .msg h3 {
     display: block;
     width: 100%;
     margin-bottom: 5px;
     color: #808080;
 }
-.chat .body ul li .messasge .preview {
+.chat .body ul li .msg .preview {
     display: block;
     width: 100%;
     max-width: 200px;
     margin-bottom: 5px;
-    color: #cccccc;
+    color: #715454;
     font-size: 12px;
 }
-.chat .body ul li .messasge .meta {
+.chat .body ul li .msg .meta {
     color: #b3b3b3;
     font-size: 12px;
 }
-.chat .body ul li .messasge .meta a {
+.chat .body ul li .msg .meta a {
     color: #999999;
     text-decoration: none;
 }
-.chat .body ul li .messasge .meta a:hover {
+.chat .body ul li .msg .meta a:hover {
     text-decoration: underline;
 }
 .chat .body ul li .message {

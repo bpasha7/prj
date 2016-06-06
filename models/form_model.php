@@ -229,6 +229,9 @@ class Form_Model extends Model
         echo '<li><label class="form-label">Количество</label>
         <input name="count" type="text" class="field-style field-full align-none" pattern="^[ 0-9]+$" placeholder="Введите число экземпляров" required/>
         </li>';
+        echo '<li><label class="form-label">Ставка</label>
+        <input name="bet" type="text" class="field-style field-full align-none" pattern="\d{0,13}\,\d{2}" placeholder="Введите ставку. Формат ***,**" required/>
+        </li>';
         echo '<li><label class="form-label">Начало торгов</label>
         <input name="date" type="date" class="field-style field-split align-left" placeholder="Выберите начало торгов"/>
         </li>';
@@ -258,7 +261,7 @@ class Form_Model extends Model
     public function createlot()
     {
         if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
-            $sth   = $this->database->prepare("INSERT INTO Lots VALUES(NULL, :id, :price, :count, :datestart, :days, :active )");
+            $sth   = $this->database->prepare("INSERT INTO Lots VALUES(NULL, :id, :price, :count, :datestart, :days, :active, :bet, :lastprice, :userid )");
             $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
             $price = str_replace(',','.',$_POST['price']);
             if (        $sth->execute(array(
@@ -267,7 +270,10 @@ class Form_Model extends Model
                         ':count' => $_POST['count'],
                         ':datestart' => $_POST['date'],
                         ':days' => $_POST['days'],
-                        ':active' => $_POST['active']
+                        ':active' => $_POST['active'],
+                        ':bet' => str_replace(',','.',$_POST['bet']),
+                        ':lastprice' => $price,
+                        ':userid' => NULL
                     )))
             echo 'OK';
             else
