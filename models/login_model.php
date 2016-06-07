@@ -7,21 +7,18 @@ class Login_Model extends Model
 	}
 	public function run()
 	{
-		//echo "ter";
-		//$data = array('status' => 'OK','username'=> '456', 'userrole'=> '7777');
- 			//echo json_encode($data);
-		$sth=$this->database->prepare("SELECT UserID, UserRole, UserName FROM Users WHERE UserMail = :login AND UserPass = :password");
+		//Вызов функции на проверку существования учетной записи
+		$sth=$this->database->prepare("CALL authorization(:login, :password)");
+		//Удаление "магическийх ковычек", защита от SQL- иньекций
 		$sth->execute(array(
-				':login'   => $_POST['login'],
-				':password'=> base64_encode(md5($_POST['password']))
+				':login'   =>  mysql_escape_string($_POST['login']),
+				':password'=> base64_encode(md5(mysql_escape_string($_POST['password'])))
 			));
-			//$data= $sth->fetchAll();
-       // echo json_encode($data);
-		$data = $sth->fetch(PDO::FETCH_ASSOC);
-		$count= $sth->rowCount();
-		
+			$count= $sth->rowCount();	
+		//если пользователя найден, заносим данные в сессию
 		if($count > 0)
 		{
+			$data = $sth->fetch(PDO::FETCH_ASSOC);	
 			Session::init();
 			Session::set('loggedIn', true);		
 			Session::set('User', $data['UserID']);
@@ -29,9 +26,7 @@ class Login_Model extends Model
 			Session::set('UserName',  $data['UserName']);
 			echo json_encode($data);
 		}
-		else
-		{   
-		}
+		$sth->closeCursor();
 	}
 }
 ?>

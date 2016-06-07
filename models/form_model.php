@@ -143,15 +143,17 @@ class Form_Model extends Model
     }
     public function createitem()
     {
-        // Session::init();
-
+		//только авторизованные пользователи могут создавтаь описание товаров
         if (Session::get('loggedIn') == true && Session::get('Role') != 'banned') {
             $paramsname = array();
             $data = array();
+			//считывание группы товара
             $grp   = $_POST['group'];
+			//Узнаем название колонок определеной группы
             $sth   = $this->database->prepare("CALL ColsName( $grp, 0)");
             $sth->execute();
             $count = $sth->rowCount();
+			//заносим название колонк в параметры
             if ($count > 0) {
                 $skipping = 0;
                 while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
@@ -162,15 +164,14 @@ class Form_Model extends Model
                 }
             }
             $sth->closeCursor();
+			//Считываем данные, переданные методом POST,в зависимости от группы
             for ($i = 0;$i < count($paramsname);$i++) {
-                //$data[$paramsname[$i]] = $_POST[$paramsname[$i]];
-                //echo $data;
                 $data[] = $paramsname[$i];
                 $data[] = $_POST[$paramsname[$i]];
 
             }
             $d   = json_encode($data);
-            //echo $d;
+			//Вызов процедуры добавления товара
             $sth = $this->database->prepare("CALL NewItem( :owner, :grp, :titel, :data )");
             if (        $sth->execute(array(
                         ':owner' => Session::get('User'),
@@ -178,6 +179,8 @@ class Form_Model extends Model
                         ':titel' => $_POST['Titel'],
                         ':data' => $d
                     ))) {
+						//после успешного добавления, переносим изображения товара в директорию, названную - ID товара и 
+						//удаляем временную
                 if (!empty($_SESSION['imgDir'])) {
                     $row                = $sth->fetch(PDO::FETCH_LAZY);
                     $lID                = $row['LastID'];
@@ -185,13 +188,9 @@ class Form_Model extends Model
                     $destination_folder = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$lID.'\\';
                     mkdir($destination_folder);
                     mkdir($destination_folder. "thumb\\");
-                    // Get array of all source files
                     $files              = scandir($dir);
-                    // Identify directories
-                    // Cycle through all source files
                     foreach ($files as $file) {
                         if (in_array($file, array(".",".."))) continue;
-                        // If we copied this successfully, mark it for deletion
                         if(stripos($file, 'thumb_')!== false && copy($dir.$file, $destination_folder."thumb\\".$file)){
 							$delete[] = $dir.$file;
 							continue;
@@ -201,11 +200,11 @@ class Form_Model extends Model
                         }
 
                     }
-                    // Delete all successfully - copied files
                     foreach ($delete as $file) {
                         unlink($file);
                     }
                     rmdir($dir);
+					//очищаем данные о временной директории
                     unset($_SESSION['imgDir']);
                     //echo '';
                 }
@@ -218,7 +217,6 @@ class Form_Model extends Model
         else {
             echo 'Вы забанены!';
         }
-
     }
     public function lotfields()
     {

@@ -9,6 +9,7 @@ class Index extends Controller
 	public function index()
 	{
 		$this->view->render('index/index');
+		echo '<div id="content"></div>';
 		//echo 'INSIDE INDEX INDEX';
 	}
 

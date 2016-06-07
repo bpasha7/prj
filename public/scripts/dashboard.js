@@ -1,34 +1,62 @@
 $(document).ready(function($){
-        var URL = 'http://wts.dev/';
-        var h = 0;
+var URL = 'http://wts.dev/';
+var h = 0;
 
-        //==MENU===============================================
-        $('#nav li a').click(function(){
-                var menuId = $(this).attr('rel');
-                if(menuId !== undefined)
-                {
-                    $.ajax({
-                            url: URL+menuId,
-                            success: function(html){
-                                $('#content').html(html);
-                            }
-                        });
-                    switch(menuId){
-                        case 'menu/index':
-                        $.ajax({
-                                url: URL+'menu/top',
-                                success: function(html){
-                                    $('.plans').html(html);
-                                    //$('#item_id').val(lotId);
-                                }
-                            });
-                        break;
-
-                        default:
-                        break;
+//==MENU===============================================
+$('#nav li a').click(function(){
+        var menuId = $(this).attr('rel');
+        if(menuId !== undefined)
+        {
+            $.ajax({
+                    url: URL+menuId,
+                    success: function(html){
+                        $('#content').html(html);
                     }
+                });
+            switch(menuId){
+                case 'menu/index':
+                $.ajax({
+                        url: URL+'menu/top',
+                        success: function(html){
+                            $('.plans').html(html);
+                            //$('#item_id').val(lotId);
+                        }
+                    });
+                break;
+
+                default:
+                break;
+            }
+        }
+    });
+//===Auction=================================
+//Search lots
+$("#content").on('submit','#search_bar', function(){
+	var pattern = $(this).serialize();
+        $.ajax({
+                url: URL+'menu/searchlots',
+                type: "POST",
+                data: pattern,
+                success: function(html){             	
+                    $('#auction_lots').html(html);
                 }
+                });
+                return false;
             });
+$("#content").on('click','a.to_lot', function(){
+                var ItemId = $(this).attr('rel');
+                var LotId = $(this).attr('lot');
+                window.open( URL+'lot/newpage/'+ItemId+':'+LotId, '_blank');
+               /* $.ajax({
+                        url: URL+'lot/index/'+ItemId+':'+LotId,
+                        success: function(html){
+                        	
+
+                            //$('#content').html(html);
+                        }
+                    });*/
+            });
+        //===========================================
         //==StickMenu=====================
         /* var MenuStick = $("#container"); //Получаем нужный объект
         var topOfMenuStick = $(MenuStick).offset().top; //Получаем начальное расположение нашего блока
@@ -51,44 +79,40 @@ $(document).ready(function($){
 
             });
         $("#content").on('click','#sent_msg', function(){
-        	var message = {
-				'msg' : $('#typing_text').val(),
-				'lot': $(this).attr('lot')
-			};
-			var t = JSON.stringify(message)
+                var message = {
+                    'msg' : $('#typing_text').val(),
+                    'lot': $(this).attr('lot')
+                };
+                var t = JSON.stringify(message)
                 $.ajax({
                         url: URL+'lot/addcomment',
                         type: "POST",
                         data:  message,
                         success: function(html){
-                        	if(html!='NO')
-                            	$('#content2').html(html);
-                           	else
-                           		alert('Не получилось отправить!');
-                            // $('#form_titel').text('Создание лота<' + lotName +'>');
-                            //$('#open_userbar').click();
+                            if(html!='NO')
+                            $('#content2').html(html);
+                            else
+                            alert('Не получилось отправить!');
                         }
                     });
 
             });
-            $("#content").on('click','.rating span', function(){
-        	var stars = {
-				'count' : $(this).attr('starnum'),
-				'comment': $(this).parent().attr('coment'),
-				'lot': $('.rating').attr('lot')			
-			};
-			var t = JSON.stringify(stars);
+        $("#content").on('click','.rating span', function(){
+                var stars = {
+                    'count' : $(this).attr('starnum'),
+                    'comment': $(this).parent().attr('coment'),
+                    'lot': $('.rating').attr('lot')
+                };
+                var t = JSON.stringify(stars);
                 $.ajax({
                         url: URL+'lot/addstars',
                         type: "POST",
                         data:  stars,
                         success: function(html){
-                        	if(html!='NO')
-                            	$('#content2').html(html);
-                           	else
-                           		alert('Вы не можете оценить!');
-                            // $('#form_titel').text('Создание лота<' + lotName +'>');
-                            //$('#open_userbar').click();
+                            if(html!='NO')
+                            $('#content2').html(html);
+                            else
+                            alert('Вы не можете оценить!');
                         }
                     });
 
@@ -100,19 +124,8 @@ $(document).ready(function($){
                         url: URL+'lot/index/'+ItemId+':'+LotId,
                         success: function(html){
                             $('#content').html(html);
-                            // $('#form_titel').text('Создание лота<' + lotName +'>');
-                            //$('#open_userbar').click();
                         }
                     });
-                /* $.ajax({
-                url: URL+'form/lotfields',
-                success: function(html){
-                $('#form_fields').html(html);
-                $('#item_id').val(lotId);
-                //$('#lot_name').attr('rel') = '234';
-                //$('#lot_name').val(lotName);
-                }
-                });*/
             });
         $("#content").on('click','#slider img', function(e){
                 var Imgid = $(this).attr('rel');
@@ -129,42 +142,6 @@ $(document).ready(function($){
                     },
                     500);
             });
-        //Нажатие на картинку
-        $('#images').children().click(function()
-            {
-                //var l = $('#images').children().length;
-                var clickedimg = event.target.id;
-                /*var imgarr =[];
-                for(i=0;i<l;i++){
-                var imgset = {};
-                imgset.id = "image"+i.toString();
-                imgset.imgfull = "i"+i.toString();
-                imgarr.push(imgset);
-                }*/
-                var at =$('#'+clickedimg.toString()).prop('src');
-                //at= at.substr(19, at.legth);
-                $("#f").attr("src",at);
-                $("#grey_screen").css('display','block');
-                //$("#f").css('display','block');
-                $('#imgboard').show();
-                //$("#images").hide();
-                //$("#slider").hide();
-                //$('#f').attr('src', $('3f').attr('src').
-                //$('#'+clickedimg.toString()+'f').show();
-            });
-
-        $("#grey_screen").click(function(e)
-            {
-                //$(".menu .active").removeClass();
-                $('#grey_screen').css('display','none');
-                $('#imgboard').hide();
-                //$("#images").show();
-                //$("#slider").show();
-                //$("#main_page").addClass("active");
-            });
-        //=====
-        //===item description
-
         //Logining
         $("#login_back").on('submit', '#loginForm', function(e){
                 var data = $(this).serialize();
@@ -183,7 +160,7 @@ $(document).ready(function($){
                             //$("#loginForm").fadeOut("slow");
                             $('#login_back').fadeOut("fast");
                         },
-                        error: function() {
+                        error: function(data) {
                             alert("Неправильные логин или пароль");
                         }
                     });

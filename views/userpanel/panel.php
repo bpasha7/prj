@@ -4,13 +4,13 @@
 <div class="box-head">
     <h2 id="tbl_name" class="left">
     </h2>
-    <div class="pright">
+<!--    <div class="pright">
         <label>
             Поиск
         </label>
         <input type="text" class="field small-field" />
         <input type="submit" class="button" value="Найти" />
-    </div>
+    </div>-->
 </div>
 <!-- End Box Head -->
 <!-- Table -->

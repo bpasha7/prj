@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/plans.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/lot.css">
 	<link rel="stylesheet" href="<?php echo URL; ?>public/css/chat.css">
+	<link rel="stylesheet" href="<?php echo URL; ?>public/css/auction.css">
 <!--	 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> -->
 	
 	<script type="text/javascript" src="<?php echo URL; ?>public/scripts/jquery-2.2.4.js"></script>
@@ -53,8 +54,6 @@
             <div id="userbar_content" class="messagetable">
             </div>
         </div>
-<!--<div id="header">-->
-<!--<h1>Главная страница</h1>-->
 <div id="login_back" class="back"></div>
 <div id="container">
 	<ul id="nav">
@@ -73,8 +72,4 @@
 	<br>
 </div>
 
-<!--</div>-->
-<div id="content">
-
-</div>
 

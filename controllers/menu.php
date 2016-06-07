@@ -24,15 +24,15 @@ class Menu extends Controller
 		$this->model->top();
 		//echo '<div class="clear_content"></div>';
 	}
-	public function other($arg = false)
+	public function auction()
 	{
-		//echo "1234";
-		//echo json_encode(array('status' => 'OK','username'=> '234' ));
-		//echo json_encode('{ "status": "OK","username": "456", "userrole": "7777" }');
-		echo "Мы в методе other контроллера Help";
-		echo "Параметры: ".$arg;
-		//require 'models/help_model.php';
-		//$model = new Help_Model();
+		$this->view->render('menu/auction', TRUE);
+		//echo '<div class="clear_content"></div>';
 	}
+	public function searchlots()
+	{
+		$this->model->searchlots();
+	}
+	
 }
 ?>

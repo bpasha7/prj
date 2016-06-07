@@ -44,31 +44,6 @@ class Lot_Model extends Model
     }
     public function about($id, $lot)
     {
-        /*echo '<section class="tabs">
-        <input id="tab-1" type="radio" name="radio-set" class="tab-selector-1" checked="checked" />
-        <label for="tab-1" class="tab-label-1">
-        Описание
-        </label>
-
-        <input id="tab-2" type="radio" name="radio-set" class="tab-selector-2" />
-        <label for="tab-2" class="tab-label-2">
-        Вопросы
-        </label>
-
-        <!--<input id="tab-3" type="radio" name="radio-set" class="tab-selector-3" />
-        <label for="tab-3" class="tab-label-3">Work</label>-->
-
-        <input id="tab-4" type="radio" name="radio-set" class="tab-selector-4" />
-        <label for="tab-4" class="tab-label-4">
-        Продавец
-        </label>
-
-        <div class="clear-shadow">
-        </div>
-
-        <div id="m_content" class="contents">
-
-        <div class="content-1">';*/
         echo '
         <div class="tabs">
         <input id="tab1" type="radio" name="tabs" checked hidden>
@@ -89,7 +64,6 @@ class Lot_Model extends Model
         //echo " < h2 > About us</h2><p > ";
         foreach ($rows as $key => $value) {
             if ($skiping > 3 ) {
-                //if($value != "" || $key == "Коментрарий"){
                 switch ($key) {
                     case "Название":
                     echo "<h2>Полная информация</h2><p>";
@@ -103,17 +77,6 @@ class Lot_Model extends Model
                     }
                     break;
                 }
-                /*if($key == "Коментрарий"){
-                echo "</p><h3>Коментрарий</h3><p$value</p></p>";
-                //break;
-                }
-                else{
-                echo "<p>$key: $value</p>";
-                }
-                }
-                else{
-                continue;//echo "<p>$key: ---</p>";
-                }*/
             }
             $skiping++;
         }
@@ -133,13 +96,10 @@ class Lot_Model extends Model
     }
     public function  comments($lot)
     {
-
         $sth = $this->database->prepare("SELECT * FROM Lotscoments WHERE Lot = $lot");
         $sth->execute();
-        //$cls_type = 0;
         echo '<div class="chat">
         <div class="body">
-
         <ul>';
         while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
 
@@ -188,7 +148,7 @@ class Lot_Model extends Model
         echo '</ul>
         </div>
         <div class="type_msg">
-        <textarea id="typing_text" type="text" class="field-type" placeholder="Введите собщение"/>
+        <textarea id="typing_text" type="text" class="field-type" placeholder="Введите собщение"></textarea>
         <input id="sent_msg" lot="'.$lot.'"class="msg_submit" type="submit"  value="Задать" />
         </div>
         </div>';
@@ -196,9 +156,9 @@ class Lot_Model extends Model
     }
     public function addcomment()
     {
+		//добавление коментария к лоту, если пользователь авторизован
         if (Session::get('loggedIn') == true) {
-            //$userid = Session::get('User');
-            //How many items does user have
+			//выполнение функции добавления коментраия к лоту
             $sth = $this->database->prepare("CALL addcoment(:msg, :userid, :lot)");
             $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
             if (        $sth->execute(array(
@@ -206,20 +166,19 @@ class Lot_Model extends Model
                         ':userid' => Session::get('User'),
                         ':lot' => $_POST['lot']
                     )))
+			//вывод обновленных коментраий
             $this->comments($_POST['lot']);
-            //echo 'OK';
             else
             print_r($sth->errorInfo());//echo 'Ошибка создания учетной записи!';
         }
         else
+			//иначе вывод сообщения
         echo 'Вы не авторизованы!';
         $sth->closeCursor();
     }
     public function addstars()
     {
         if (Session::get('loggedIn') == true) {
-            //$userid = Session::get('User');
-            //How many items does user have
             $sth = $this->database->prepare("CALL addstars(:coment, :count, :userid )");
             $this->database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
             $sth->execute(array(
@@ -242,7 +201,6 @@ class Lot_Model extends Model
         }
         else
         echo 'Вы не авторизованы!';
-        //$sth->closeCursor();
     }
 }
 ?>
