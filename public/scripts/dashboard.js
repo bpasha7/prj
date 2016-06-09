@@ -1,60 +1,60 @@
 $(document).ready(function($){
-var URL = 'http://wts.dev/';
-var h = 0;
+        var URL = 'http://wts.dev/';
+        var h = 0;
 
-//==MENU===============================================
-$('#nav li a').click(function(){
-        var menuId = $(this).attr('rel');
-        if(menuId !== undefined)
-        {
-            $.ajax({
-                    url: URL+menuId,
-                    success: function(html){
-                        $('#content').html(html);
+        //==MENU===============================================
+        $('#nav li a').click(function(){
+                var menuId = $(this).attr('rel');
+                if(menuId !== undefined)
+                {
+                    $.ajax({
+                            url: URL+menuId,
+                            success: function(html){
+                                $('#content').html(html);
+                            }
+                        });
+                    switch(menuId){
+                        case 'menu/index':
+                        $.ajax({
+                                url: URL+'menu/top',
+                                success: function(html){
+                                    $('.plans').html(html);
+                                    //$('#item_id').val(lotId);
+                                }
+                            });
+                        break;
+
+                        default:
+                        break;
                     }
-                });
-            switch(menuId){
-                case 'menu/index':
+                }
+            });
+        //===Auction=================================
+        //Search lots
+        $("#content").on('submit','#search_bar', function(){
+                var pattern = $(this).serialize();
                 $.ajax({
-                        url: URL+'menu/top',
+                        url: URL+'menu/searchlots',
+                        type: "POST",
+                        data: pattern,
                         success: function(html){
-                            $('.plans').html(html);
-                            //$('#item_id').val(lotId);
+                            $('#auction_lots').html(html);
                         }
                     });
-                break;
-
-                default:
-                break;
-            }
-        }
-    });
-//===Auction=================================
-//Search lots
-$("#content").on('submit','#search_bar', function(){
-	var pattern = $(this).serialize();
-        $.ajax({
-                url: URL+'menu/searchlots',
-                type: "POST",
-                data: pattern,
-                success: function(html){             	
-                    $('#auction_lots').html(html);
-                }
-                });
                 return false;
             });
-$("#content").on('click','a.to_lot', function(){
+        $("#content").on('click','a.to_lot', function(){
                 var ItemId = $(this).attr('rel');
                 var LotId = $(this).attr('lot');
                 window.open( URL+'lot/newpage/'+ItemId+':'+LotId, '_blank');
-               /* $.ajax({
-                        url: URL+'lot/index/'+ItemId+':'+LotId,
-                        success: function(html){
-                        	
+                /* $.ajax({
+                url: URL+'lot/index/'+ItemId+':'+LotId,
+                success: function(html){
 
-                            //$('#content').html(html);
-                        }
-                    });*/
+
+                //$('#content').html(html);
+                }
+                });*/
             });
         //===========================================
         //==StickMenu=====================
@@ -72,6 +72,19 @@ $("#content").on('click','a.to_lot', function(){
         });*/
         //====================================================
         //===Lot script====
+        $("#content").on('submit','#bet', function(){
+                var bid = $(this).serialize();
+                $.ajax({
+                        url: URL+'lot/newbid',
+                        type: "POST",
+                        data:  bid,
+                        success: function(html){
+                            //setTimeout(function(html) { alert(html) }, 1000);
+                            $('#bet').html(html)
+                        }
+                    });
+                return false;
+            });
         $("#content").on('click','a#writeto', function(){
                 var who = $(this).attr('rel');
                 $('#typing_text').text(who+', ');
@@ -95,7 +108,6 @@ $("#content").on('click','a.to_lot', function(){
                             alert('Не получилось отправить!');
                         }
                     });
-
             });
         $("#content").on('click','.rating span', function(){
                 var stars = {
@@ -120,12 +132,13 @@ $("#content").on('click','a.to_lot', function(){
         $("#content").on('click','a.plan-button', function(){
                 var ItemId = $(this).attr('rel');
                 var LotId = $(this).attr('lot');
-                $.ajax({
-                        url: URL+'lot/index/'+ItemId+':'+LotId,
-                        success: function(html){
-                            $('#content').html(html);
-                        }
-                    });
+                window.open( URL+'lot/newpage/'+ItemId+':'+LotId, '_blank');
+                /* $.ajax({
+                url: URL+'lot/index/'+ItemId+':'+LotId,
+                success: function(html){
+                $('#content').html(html);
+                }
+                });*/
             });
         $("#content").on('click','#slider img', function(e){
                 var Imgid = $(this).attr('rel');
@@ -253,21 +266,14 @@ $("#content").on('click','a.to_lot', function(){
                         height: "500"
                     }, 500, function() {
                         $.ajax({
-                                url: URL+'userpanel/index',
-                                success: function(html){
-                                    $("#userbar_content").html(html);
-                                }
-                            });
-                        $('#open_userbar').offset({top:500, right:5});
-                        $( "#tbl" ).empty();
-                        $.ajax({
                                 url: URL+'userpanel/lots',
                                 success: function(html){
                                     $("#tbl").html(html);
                                     $('#tbl_name').text('Мои Лоты');
                                 }
-                                //return false;
                             });
+                        $('#open_userbar').offset({top:500, right:5});
+                        $('#box').show();
                     });
             });
         //Users items
@@ -276,21 +282,31 @@ $("#content").on('click','a.to_lot', function(){
                         height: "500"
                     }, 500, function() {
                         $.ajax({
-                                url: URL+'userpanel/index',
-                                success: function(html){
-                                    $("#userbar_content").html(html);
-                                }
-                            });
-                        $('#open_userbar').offset({top:500, right:5});
-                        $( "#tbl" ).empty();
-                        $.ajax({
                                 url: URL+'userpanel/items',
                                 success: function(html){
                                     $("#tbl").html(html);
                                     $('#tbl_name').text('Мои товары');
-                                    // return false;
+                                   
                                 }
                             });
+                         $('#open_userbar').offset({top:500, right:5});
+                       	 $('#box').show();
+                    });
+            });
+        //Users bets
+        $('#my_bets').click(function(e){
+			$('#tst').animate({
+                        height: "500"
+                    }, 500, function() {
+                        $.ajax({
+                                url: URL+'userpanel/bets',
+                                success: function(html){
+                                    $("#tbl").html(html);
+                                    $('#tbl_name').text('Ставки');
+                                }
+                            });
+                        $('#open_userbar').offset({top:500, right:5});
+                        $('#box').show();
                     });
             });
         //delete items by click
@@ -311,15 +327,14 @@ $("#content").on('click','a.to_lot', function(){
         $("#userbar_content").on('click','a.ico.create', function(){
                 var lotName = $(this).attr('name');
                 var lotId = $(this).attr('rel');
+               
                 if(confirm("Перейти к созданию лота <"+lotName+">?")){
-                    $.ajax({
+                	  $.ajax({
                             url: URL+'form',
                             success: function(html){
                                 $('#content').html(html);
                                 $('#form_titel').text('Создание лота<' + lotName +'>');
                                 $('#open_userbar').click();
-                            }
-                        });
                     $.ajax({
                             url: URL+'form/lotfields',
                             success: function(html){
@@ -328,6 +343,8 @@ $("#content").on('click','a.to_lot', function(){
                                 //$('#lot_name').attr('rel') = '234';
                                 //$('#lot_name').val(lotName);
                             }
+                        });
+                                                    }
                         });
                     return false;
                 }
@@ -495,26 +512,6 @@ $("#content").on('click','a.to_lot', function(){
                     $("#output").html("Are you kidding me?");
                     return false
                 }
-                /*var fsize = $('#imageInput')[0].files[0].size; //get file size
-                var ftype = $('#imageInput')[0].files[0].type; // get file type
-
-                //allow only valid image file types
-                switch(ftype)
-                {
-                case 'image/png': case 'image/gif': case 'image/jpeg': case 'image/pjpeg':
-                break;
-                default:
-                $("#output").html("<b>"+ftype+"</b> Unsupported file type!");
-                return false
-                }
-
-                //Allowed file size is less than 1 MB (1048576)
-                if(fsize>1048576)
-                {
-                $("#output").html("<b>"+bytesToSize(fsize) +"</b> Too big Image file! <br />Please reduce the size of your photo using an image editor.");
-                return false
-                }*/
-
 
                 //Progress bar
                 $('#progressbox').show(); //show progressbar

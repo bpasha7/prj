@@ -22,12 +22,17 @@ class Lot extends Controller
     {
 			$this->model->addstars();
 	}
+	public function newbid()
+    {
+			$this->model->newbid();
+	}
 	public function newpage($id)
 	{
 		$this->view->render('lot/index');
 		$lot = substr($id, strripos($id, ':')+1 , strlen($id) - strripos($id,':'));
     	$id = substr($id, 0 ,strripos($id,':'));
     	echo '<div id="content">';
+    	$this->model->bet($lot);
     	$this->model->images($id);
     	$this->model->about($id, $lot);
     	echo '</div>';

@@ -4,8 +4,6 @@ class Menu extends Controller
 	public function __construct()
 	{
 		parent::__construct();
-		//echo "Мы HELP";
-		//$this->view->render('help / index');
 	}
 	public function help()
 	{
@@ -32,6 +30,14 @@ class Menu extends Controller
 	public function searchlots()
 	{
 		$this->model->searchlots();
+	}
+	public function pie()
+    {
+    	$this->model->pie();
+	}
+	public function bars()
+    {
+    	$this->model->bars();
 	}
 	
 }

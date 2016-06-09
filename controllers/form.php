@@ -17,7 +17,7 @@ class Form extends Controller
    	public function fields($arg = false)
    	{
 		$this->model->fields($arg);
-		echo '<div class="clear_content"> a</div>';
+		//echo '<div class="clear_content"> a</div>';
 	}	
 	public function createitem()
    	{
@@ -35,7 +35,7 @@ class Form extends Controller
 	public function lotfields()
 	{
 		$this->model->lotfields();
-		echo '<div class="clear_content"> a</div>';
+		//echo '<div class="clear_content"> a</div>';
 	}
 	public function registration()
 	{
@@ -44,7 +44,7 @@ class Form extends Controller
 	public function registrationfields()
 	{
 		$this->model->registrationfields();
-		echo '<div class="clear_content"> a</div>';
+		//echo '<div class="clear_content"> a</div>';
 	}
 	public function test()
 	{

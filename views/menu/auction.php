@@ -1,7 +1,7 @@
 <form id="search_bar" class="form-wrapper cf">
-<!--    <h2>
+     <h2>
         Аукцион
-    </h2>-->
+    </h2>
     <input name="name" type="text" placeholder="Попробуем что-нибудь найти?" required>
     <button type="submit">
         Искать

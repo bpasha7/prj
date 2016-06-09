@@ -33,6 +33,10 @@ class UserPanel extends Controller
 	{
 		$this->model->deletelot($id);
 	}
+	 public function bets()
+	{
+		$this->model->bets();
+	}
 	//удаление лота
 
 }

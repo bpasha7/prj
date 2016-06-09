@@ -62,6 +62,14 @@ class UserPanel_Model extends Model
                         ':itemid'=>$id
                     ))) {
                 $dir   = realpath($_SERVER['DOCUMENT_ROOT']).'\public\data\\'.$id.'\\';
+                $thumbdir = $dir.'thumb\\';
+                $files = scandir($thumbdir);
+                // Delete all successfully - copied files
+                foreach ($files as $file) {
+                    if (in_array($file, array(".",".."))) continue;
+                    unlink($thumbdir.$file);
+                }
+                rmdir($thumbdir);
                 $files = scandir($dir);
                 // Delete all successfully - copied files
                 foreach ($files as $file) {
@@ -97,9 +105,42 @@ class UserPanel_Model extends Model
             echo 'Опция недоступна! Учетная запись ограничена в пользовании!';
         }
     }
+    public function bets()
+    {
+         if (Session::get('loggedIn') == true) {
+            $userid = Session::get('User');
+            //How many items does user have
+            $sth    = $this->database->prepare("SELECT * FROM aboutlots WHERE LotWinner = :userid");
+            $sth->execute(array(
+                    ':userid'=> $userid
+                ));
+            $count = $sth->rowCount();
+            if ($count > 0) {
+                echo "<tr>\n
+                \t<th>Лот</th>\n
+                \t<th>Группа</th>\n
+                \t<th>Ставка</th>\n
+                \t<th>Остлось дней</th>\n";
+                $odd = 1;
+                while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
+                    if ($odd % 2 == 0)
+                    echo "<tr>\n";
+                    else
+                    echo "<tr class=\"odd\">\n";
+                    echo
+                    "\t<td><h3>".$row->ItemName."</h3></td>\n
+                    \t<td>".$row['Группа']."</td>\n
+                    \t<td>". number_format( str_replace(',','.',$row['Bid']), 2 )."&#8381</td>\n
+                    \t<td>".$row->Days."</td>\n
+                    </tr>\n";
+                    $odd++;
+                }
+            }
+            $sth->closeCursor();
+        }
+    }
     public function items()
     {
-        // Session::init();
         if (Session::get('loggedIn') == true) {
             $userid = Session::get('User');
             //How many items does user have
@@ -128,25 +169,16 @@ class UserPanel_Model extends Model
                     <a name=\"item\" rel=\"".$row->ItemId."\" class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
                     $odd++;
                 }
-                //echo "</tbody > ";
             }
-            else {
-
-            }
-            //$data[] = $row;
-            // echo json_encode($data);
             $sth->closeCursor();
-        }
-        else {
         }
     }
     public function lots()
     {
-        //Session::init();
         if (Session::get('loggedIn') == true) {
             $userid = Session::get('User');
             //How many items does user have
-            $sth    = $this->database->prepare("SELECT * FROM userslots WHERE UserId = :userid");
+            $sth    = $this->database->prepare("SELECT * FROM aboutlots WHERE UserId = :userid");
             $sth->execute(array(
                     ':userid'=> $userid
                 ));
@@ -156,8 +188,9 @@ class UserPanel_Model extends Model
                 \t<th>Лот</th>\n
                 \t<th>Группа</th>\n
                 \t<th>Цена</th>\n
-                \t<th>Дата создания</th>\n
-                \t<th>Тип</th>\n
+                \t<th>Ставка</th>\n
+                \t<th>Предложение</th>\n
+                \t<th>Остлось дней</th>\n         
                 \t<th width=\"110\" class=\"ac\">Управление</th></tr>\n";
                 $odd = 1;
                 while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
@@ -167,26 +200,18 @@ class UserPanel_Model extends Model
                     echo "<tr class=\"odd\">\n";
                     echo
                     "\t<td><h3>".$row->ItemName."</h3></td>\n
-                    \t<td>".$row->Group."</td>\n
-                    \t<td>". number_format( str_replace(',','.',$row->Price), 2 )."&#8381</td>\n
-                    \t<td>".$row->Created."</td>\n
-                    \t<td>".$row->PrName."</td>\n
+                    \t<td>".$row['Группа']."</td>\n
+                    \t<td>". number_format( str_replace(',','.',$row['Цена']), 2 )."&#8381</td>\n
+                    \t<td>". number_format( str_replace(',','.',$row['Bet']), 2 )."&#8381</td>\n
+                    \t<td>". number_format( str_replace(',','.',$row['Bid']), 2 )."&#8381</td>\n
+                    \t<td>".$row->Days."</td>\n
                     \t<td>
                     <a  class=\"ico edit\"><span class=\"tooltiptext\">Изменить</span></a>
                     <a  name=\"lot\" rel=\"".$row->LotId."\"class=\"ico del\"><span class=\"tooltiptext\">Удалить</span></a></td></tr>\n";
                     $odd++;
                 }
-                //echo "</tbody > ";
             }
-            else {
-
-            }
-            //$data[] = $row;
-            // echo json_encode($data);
             $sth->closeCursor();
-        }
-        else {
-
         }
     }
 }

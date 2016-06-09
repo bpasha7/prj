@@ -13,7 +13,7 @@ class Menu_Model extends Model
     }
     public function top()
     {
-        $sth      = $this->database->prepare("SELECT LotId, ItemId, ItemName, `Группа`, `Цена`, `Кол-во`, `Создано` FROM aboutlots WHERE LotActive = 1");
+        $sth      = $this->database->prepare("SELECT LotId, ItemId, ItemName, `Группа`, `Цена`, `Кол-во`, Days FROM aboutlots WHERE LotActive = 1 AND Days != 'Торги окончены'");
         $sth->execute();
         $cls_type = 0;
         while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
@@ -39,7 +39,7 @@ class Menu_Model extends Model
                 <ul class="plan-features">
                 <li><strong>'.$row['Цена'].'</strong> &#8381</li>
                 <li><strong>'.$row['Кол-во'].'</strong>шт.</li>
-                <li><strong>'.$row['Создано'].'</strong> Создано</li>
+                <li><strong>'.$row['Days'].'</strong> Осталось дней</li>
                 </ul>
                 <a rel="'.$row['ItemId'].'" lot="'.$row['LotId'].'" class="plan-button">Перейти</a>
                 </div>';
@@ -61,8 +61,8 @@ class Menu_Model extends Model
         $srt = $_POST['sort'];
         if($srt != "")
         	$srt = "ORDER BY 5 $srt";      
-         $sth      = $this->database->prepare("SELECT LotId, ItemId, GroupId, ItemName, `Цена`, `Кол-во`, `Создано` FROM aboutlots WHERE
- ItemName LIKE '%$pat%' $grp $srt");
+         $sth      = $this->database->prepare("SELECT LotId, ItemId, GroupId, ItemName, `Цена`, `Кол-во`, Days FROM aboutlots WHERE
+ ItemName AND Days != 'Торги окончены' LIKE '%$pat%' $grp $srt");
         $sth->execute();
         $count= $sth->rowCount();
         //Вывод найденной информации
@@ -71,7 +71,7 @@ class Menu_Model extends Model
         <tr>
         <th colspan="2">Лот</th>
         <th>Цена</th>
-        <th>Начало торгов</th>
+        <th>До конца торгов(дни)</th>
         <th>Количество</th>
         </tr>';
         while($row = $sth->fetch(PDO::FETCH_LAZY)){
@@ -80,7 +80,7 @@ class Menu_Model extends Model
         <td><img src="'.URL.'public/data/'.$row['ItemId'].'/thumb/thumb_1.jpg"></td>
         <td><a rel="'.$row['ItemId'].'" lot="'.$row['LotId'].'" class="to_lot">'.$row['ItemName'].'</a></td>
         <td>'.$row['Цена'].'</td>
-        <td>'.$row['Создано'].'</td>
+        <td>'.$row['Days'].'</td>
         <td>'.$row['Кол-во'].'</td>
         </tr>';
 		}
@@ -90,5 +90,38 @@ class Menu_Model extends Model
 			echo '<tr><th>Ничего не найдено=(</th></tr>';
 		}
     }
+    public function pie()
+    {
+		$sth      = $this->database->prepare("CALL LotsStat()");
+        $sth->execute();
+        $stat = array();
+        while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
+        	$mystat= new Stat();
+			$mystat->label = $row['Group'];
+			$mystat->data =  $row['Lots'];
+			$stat[] = $mystat;
+            }
+            $sth->closeCursor();
+      echo json_encode($stat);
+	}
+	public function bars()
+    {
+		$sth      = $this->database->prepare("CALL CommentStat()");
+        $sth->execute();
+        $stat = array();
+        while ($row = $sth->fetch(PDO::FETCH_LAZY)) {
+        	$mystat=array();
+			$mystat[] = $row['Day'];
+			$mystat[] =  $row['Comemnts'];
+			$stat[] = $mystat;
+            }
+            $sth->closeCursor();
+      echo json_encode($stat);
+	}
+}
+class Stat
+{
+    public $label;
+    public $data;
 }
 ?>

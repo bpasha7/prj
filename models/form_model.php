@@ -13,20 +13,20 @@ class Form_Model extends Model
     }
     public function test()
     {
-    	$myNumber = 123456.78;
+    	//$myNumber = '^34gsdfgыврз2рьи356лслш%$цук562';
 
-		echo number_format( $myNumber, 2 );
+		//echo base64_encode(md5(mysql_escape_string($myNumber))).md5('fuckуфрр');
 
     }
     public function groups()
     {
         //Session::init();
-        if (Session::get('loggedIn') == true) {
+        //if (Session::get('loggedIn') == true) {
             //$userid = Session::get('User');
             //How many items does user have
             $sth = $this->database->prepare("SELECT GroupId, GroupName FROM Groups");
             $sth->execute();
-        }
+        //}
         $count = $sth->rowCount();
         if ($count > 0) {
             echo "<option disabled>Выберите пожалуйста группу...</option>";
@@ -221,7 +221,7 @@ class Form_Model extends Model
     public function lotfields()
     {
         echo '<input id="item_id" name="item_id" type="text" hidden/>';
-        echo '<li><label class="form-label">Цена</label>
+        echo '<li><label class="form-label">Начальная цена</label>
         <input name="price" type="text" class="field-style field-full align-none" pattern="\d{0,13}\,\d{2}" placeholder="Введите цену. Формат ***,**" required/>
         </li>';
         echo '<li><label class="form-label">Количество</label>

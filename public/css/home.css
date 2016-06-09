@@ -14,15 +14,17 @@ body{
     left: 2%;
 }
 #content{
-    position: relative;
-    top: 15%;
+   /* position: relative;
+    top: 15%;*/
+    padding: 10px;
     width: 80%;
     margin: 10% auto;
     background-color: #ddd ;
 }
 #content h1{
-    position: absolute;
-    left: 35%;
+    /*position: absolute;*/
+        position: relative;
+    left: 40%;
 }
 .back{
     display: none;

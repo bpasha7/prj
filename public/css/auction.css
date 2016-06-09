@@ -42,13 +42,15 @@
     box-shadow: 0 0 2px rgba(0,0,0,.8) inset;
 }
 .form-wrapper h2{
-    position: absolute;
-    left: 45%;
+    /* position: absolute;
+    left: 45%;*/
+    position: relative;
+    left: 40%;
 }
 .form-wrapper {
     width: 500px;
     padding: 15px;
-    margin: 150px auto 50px auto;
+    margin: 50px auto 50px auto;
     background: #444;
     background: rgba(0,0,0,.2);
     -moz-border-radius: 10px;
